@@ -19,12 +19,11 @@ st.set_page_config(
 )
 
 
-# Function to load and prepare data - in a real scenario, load your actual data
+# Function to load and prepare data - in a real scenario, load  actual data
 @st.cache_data
 def load_data():
     # For demo purposes, we'll create a synthetic dataset that mimics your structure
 
-    # In reality, you would use something like:
     # df = pd.read_csv('your_data.csv')
     # or
     # df = your_existing_dataframe
