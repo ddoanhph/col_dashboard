@@ -424,9 +424,8 @@ with tab2:
     growth_ltips = (
                 (compare_2024['total_ltips'] - compare_2023['total_ltips']) / compare_2023['total_ltips'] * 100).round(
         1)
-    growth_total = ((compare_2024['total_cost'] - compare_2023['total_cost'])
-
-growth_total = ((compare_2024['total_cost'] - compare_2023['total_cost']) / compare_2023['total_cost'] * 100).round(1)
+    growth_total = ((compare_2024['total_cost'] - compare_2023['total_cost']))
+    growth_total = ((compare_2024['total_cost'] - compare_2023['total_cost']) / compare_2023['total_cost'] * 100).round(1)
 
 # Create comparison chart
 categories = ['Base Salary', 'Premiums', 'Bonuses', 'Social Contributions', 'LTIPs', 'Total Cost']
