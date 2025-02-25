@@ -35,7 +35,7 @@ def load_data():
 
     divisions = ['Technology', 'Operations', 'Marketing', 'Finance', 'HR', 'Sales']
     bands = ['BZ', 'BII', 'BIII', 'BIV', 'BV']
-    regions = ['EMEA', 'APAC', 'NA', 'LATAM']
+    regions = ['USA']
     age_groups = ['20-30', '31-40', '41-50', '51+']
 
     data = {
