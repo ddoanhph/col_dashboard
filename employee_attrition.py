@@ -18,18 +18,85 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Apply custom CSS to make it look more like the React version
+st.markdown("""
+<style>
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        max-width: 72rem;
+        background-color: #F9FAFB;
+        border-radius: 0.5rem;
+    }
+    .stMetric {
+        background-color: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
+    .chart-container {
+        background-color: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        margin-bottom: 1rem;
+    }
+    h1 {
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 1.5rem !important;
+        color: #1F2937;
+    }
+    h2 {
+        font-size: 1.125rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.5rem !important;
+        color: #1F2937;
+    }
+    .recommendation {
+        background-color: #EFF6FF;
+        border: 1px solid #BFDBFE;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    .recommendation h3 {
+        font-weight: 500;
+        color: #1E40AF;
+        margin-bottom: 0.25rem;
+        font-size: 0.95rem;
+    }
+    .recommendation p {
+        font-size: 0.875rem;
+        color: #4B5563;
+    }
+    .stButton button {
+        border-radius: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    .active-button {
+        background-color: #2563EB !important;
+        color: white !important;
+    }
+    .inactive-button {
+        background-color: #E5E7EB !important;
+        color: #1F2937 !important;
+    }
+    .risk-table {
+        font-size: 0.875rem;
+    }
+    div[data-testid="stHorizontalBlock"] {
+        gap: 1rem;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# Function to load and prepare data - in a real scenario, you would load your actual data
+# Function to load and prepare data
 @st.cache_data
 def load_data():
-    # This is a placeholder - in your actual implementation, you'll load your data
-    # For demo purposes, we'll create a synthetic dataset that mimics your structure
-
-    # In reality, you would use something like:
-    # df = pd.read_csv('your_data.csv')
-    # or
-    # df = your_existing_dataframe
-
     # Create synthetic data for demonstration
     np.random.seed(42)
     n_samples = 800
@@ -56,23 +123,16 @@ def load_data():
     df = pd.DataFrame(data)
 
     # Ensure higher attrition rates for certain conditions to make the data more realistic
-    # For example, lower Role_Stability often correlates with higher attrition
     mask = (df['Role_Stability'] < 0.3) & (df['Attrition'] == 0)
     flip_indices = np.random.choice(df[mask].index, size=int(len(df[mask]) * 0.3), replace=False)
     df.loc[flip_indices, 'Attrition'] = 1
 
-    # Apply your feature engineering function - this is a simplified version
-    df_engineered = df.copy()
-
-    return df_engineered
+    return df
 
 
 # Function to train model and get predictions
 @st.cache_resource
 def get_predictions(df):
-    # In a real scenario, you would use your trained model
-    # For demo purposes, we'll train a simple model on our synthetic data
-
     # Features to use for prediction
     feature_cols = [
         'Career_Velocity', 'Role_Stability', 'Career_Growth_Score',
@@ -83,7 +143,7 @@ def get_predictions(df):
     X = df[feature_cols]
     y = df['Attrition']
 
-    # Train a model (in practice, you'd load your pre-trained model)
+    # Train a model
     model = GradientBoostingClassifier(random_state=42)
     model.fit(X, y)
 
@@ -104,8 +164,7 @@ def get_predictions(df):
         'Importance': model.feature_importances_
     }).sort_values('Importance', ascending=False)
 
-    # For demonstration purposes, we'll simulate SHAP values
-    # In practice, you would use actual SHAP values
+    # Simulate key factors
     def get_key_factors(row):
         factors = []
         if row['Role_Stability'] < 0.3:
@@ -129,8 +188,6 @@ def get_predictions(df):
 # Load data and get predictions
 df = load_data()
 df_with_predictions, model, feature_importance = get_predictions(df)
-
-# UI Components
 
 # Sidebar filters
 st.sidebar.header('Filters')
@@ -169,228 +226,300 @@ filtered_df = df_with_predictions[
     (df_with_predictions['Band'].isin(selected_bands)) &
     (df_with_predictions['Location_Region'].isin(selected_regions)) &
     (df_with_predictions['Risk_Category'].isin(selected_risk))
-    ]
+]
 
 # Main dashboard layout
 st.title('Employee Attrition Risk Dashboard')
 
-# Top metrics row
+# Top metrics row - matching React layout
 col1, col2, col3 = st.columns(3)
 
 with col1:
+    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
     total_employees = len(filtered_df)
     predicted_attrition = filtered_df['Predicted_Attrition'].sum()
     attrition_rate = (predicted_attrition / total_employees * 100) if total_employees > 0 else 0
-
-    st.metric(
-        label="Predicted Attrition",
-        value=f"{int(predicted_attrition)}",
-        delta=f"{attrition_rate:.1f}% of {total_employees} employees"
-    )
+    
+    st.markdown(f"<h2>Total Predicted Attrition</h2>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style="display: flex; align-items: center;">
+        <span style="font-size: 2rem; font-weight: bold; color: #DC2626;">{int(predicted_attrition)}</span>
+        <span style="margin-left: 0.5rem; font-size: 0.875rem; color: #6B7280;">employees predicted to leave</span>
+    </div>
+    <div style="margin-top: 0.5rem; font-size: 0.875rem; color: #4B5563;">
+        Out of {total_employees} total employees ({attrition_rate:.1f}% attrition rate)
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
-    risk_counts = filtered_df['Risk_Category'].value_counts().to_dict()
-    high_risk = risk_counts.get('High', 0)
-    medium_risk = risk_counts.get('Medium', 0)
-    low_risk = risk_counts.get('Low', 0)
-
-    st.metric(
-        label="High Risk Employees",
-        value=f"{high_risk}",
-        delta=f"{high_risk / total_employees * 100:.1f}% of total" if total_employees > 0 else "0%"
+    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+    st.markdown("<h2>Attrition Risk Distribution</h2>", unsafe_allow_html=True)
+    
+    # Get risk distribution
+    risk_counts = filtered_df['Risk_Category'].value_counts().reset_index()
+    risk_counts.columns = ['Category', 'Count']
+    
+    # Prepare pie chart
+    risk_colors = {'High': '#FF8042', 'Medium': '#FFBB28', 'Low': '#00C49F'}
+    
+    fig = px.pie(
+        risk_counts, 
+        names='Category', 
+        values='Count',
+        color='Category',
+        color_discrete_map=risk_colors,
+        hole=0.4
     )
+    
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=5, b=20),
+        height=160,
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.1,
+            xanchor="center",
+            x=0.5
+        )
+    )
+    
+    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with col3:
-    st.metric(
-        label="Medium Risk Employees",
-        value=f"{medium_risk}",
-        delta=f"{medium_risk / total_employees * 100:.1f}% of total" if total_employees > 0 else "0%"
-    )
+    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+    st.markdown("<h2>Top Risk Factors</h2>", unsafe_allow_html=True)
+    
+    for idx, row in feature_importance.head(5).iterrows():
+        feature_name = row['Feature'].replace('_', ' ')
+        importance = row['Importance']
+        width_pct = min(importance * 100 * 5, 100)  # Scale for display
+        
+        st.markdown(f"""
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <span style="font-size: 0.875rem;">{feature_name}</span>
+            <div style="width: 6rem; background-color: #E5E7EB; border-radius: 9999px; height: 0.625rem;">
+                <div style="background-color: #2563EB; height: 0.625rem; border-radius: 9999px; width: {width_pct}%;"></div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# Attrition by category section
-st.subheader('Attrition by Category')
-
-# Category selector
-category_options = ['Company_Division', 'Band', 'Location_Region', 'Age_Group']
-category_names = ['Division', 'Band', 'Region', 'Age Group']
-selected_category_index = st.radio(
-    "Select Category",
-    options=range(len(category_options)),
-    format_func=lambda i: category_names[i],
-    horizontal=True
-)
-selected_category = category_options[selected_category_index]
-
-# Calculate attrition metrics by selected category
-category_attrition = filtered_df.groupby(selected_category).agg(
-    Total=('Corp_ID', 'count'),
-    Attrition=('Predicted_Attrition', 'sum')
-)
-category_attrition['Rate'] = (category_attrition['Attrition'] / category_attrition['Total'] * 100).round(1)
-category_attrition = category_attrition.reset_index().sort_values('Rate', ascending=False)
-
-# Create visualization
-fig = make_subplots(specs=[[{"secondary_y": True}]])
-
-fig.add_trace(
-    go.Bar(
-        x=category_attrition[selected_category],
-        y=category_attrition['Attrition'],
-        name="Predicted Attrition",
-        marker_color='rgba(55, 83, 109, 0.7)'
-    )
-)
-
-fig.add_trace(
-    go.Scatter(
-        x=category_attrition[selected_category],
-        y=category_attrition['Rate'],
-        name="Attrition Rate (%)",
-        mode='lines+markers',
-        marker_color='rgba(255, 79, 38, 0.7)',
-        line=dict(width=2)
-    ),
-    secondary_y=True
-)
-
-fig.update_layout(
-    title_text=f'Attrition by {category_names[selected_category_index]}',
-    xaxis_title=category_names[selected_category_index],
-    legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=1.02,
-        xanchor="right",
-        x=1
-    ),
-    height=400
-)
-
-fig.update_yaxes(title_text="Number of Employees", secondary_y=False)
-fig.update_yaxes(title_text="Attrition Rate (%)", secondary_y=True)
-
-st.plotly_chart(fig, use_container_width=True)
-
-# Feature importance and high risk employees sections
+# Category sections - matching React layout
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader('Top Attrition Risk Factors')
-
-    # Create horizontal bar chart for feature importance
-    fig = px.bar(
-        feature_importance.head(5),
-        x='Importance',
-        y='Feature',
-        orientation='h',
-        labels={'Importance': 'Relative Importance', 'Feature': ''},
-        color='Importance',
-        color_continuous_scale=px.colors.sequential.Blues
-    )
-
-    fig.update_layout(
-        height=300,
-        yaxis=dict(autorange="reversed"),
-        coloraxis_showscale=False
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-with col2:
-    st.subheader('Risk Distribution')
-
-    fig = px.pie(
-        filtered_df,
-        names='Risk_Category',
-        values='Corp_ID',
-        color='Risk_Category',
-        color_discrete_map={'High': 'red', 'Medium': 'orange', 'Low': 'green'},
-        hole=0.4
-    )
-
-    fig.update_layout(height=300)
-    st.plotly_chart(fig, use_container_width=True)
-
-# High risk employees table
-st.subheader('Top High-Risk Employees')
-
-high_risk_employees = filtered_df[filtered_df['Risk_Category'] == 'High'].sort_values('Attrition_Risk',
-                                                                                      ascending=False).head(10)
-
-if not high_risk_employees.empty:
-    high_risk_display = high_risk_employees[['Corp_ID', 'Attrition_Risk', 'Company_Division', 'Band', 'Key_Factors']]
-    high_risk_display = high_risk_display.rename(columns={
-        'Corp_ID': 'Employee ID',
-        'Attrition_Risk': 'Risk Score',
-        'Company_Division': 'Division',
-        'Key_Factors': 'Key Risk Factors'
-    })
-
-    # Format risk score as percentage
-    high_risk_display['Risk Score'] = high_risk_display['Risk Score'].apply(lambda x: f"{x:.1%}")
-
-    st.dataframe(high_risk_display, use_container_width=True)
-else:
-    st.info("No high-risk employees match the current filters.")
-
-# Add action recommendations section
-st.subheader('Recommended Actions')
-
-col1, col2, col3 = st.columns(3)
-
-# Get top division with highest attrition
-top_attrition_division = category_attrition.iloc[0][selected_category] if not category_attrition.empty else "N/A"
-top_attrition_rate = category_attrition.iloc[0]['Rate'] if not category_attrition.empty else 0
-
-# Get top band with highest attrition if we're looking at divisions
-if selected_category != 'Band':
-    band_attrition = filtered_df.groupby('Band').agg(
+    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+    
+    # Category selector similar to React buttons
+    st.markdown("<h2>Attrition by Category</h2>", unsafe_allow_html=True)
+    
+    category_cols = st.columns(3)
+    
+    # Button states
+    if 'selected_category' not in st.session_state:
+        st.session_state.selected_category = 'Company_Division'
+    
+    # Display category buttons
+    with category_cols[0]:
+        division_btn_class = 'active-button' if st.session_state.selected_category == 'Company_Division' else 'inactive-button'
+        if st.button('Division', key='div_btn', help='View attrition by division'):
+            st.session_state.selected_category = 'Company_Division'
+            st.rerun()
+    
+    with category_cols[1]:
+        band_btn_class = 'active-button' if st.session_state.selected_category == 'Band' else 'inactive-button'
+        if st.button('Band', key='band_btn', help='View attrition by band'):
+            st.session_state.selected_category = 'Band'
+            st.rerun()
+    
+    with category_cols[2]:
+        age_btn_class = 'active-button' if st.session_state.selected_category == 'Age_Group' else 'inactive-button'
+        if st.button('Age Group', key='age_btn', help='View attrition by age group'):
+            st.session_state.selected_category = 'Age_Group'
+            st.rerun()
+    
+    # Apply the button styling
+    st.markdown(f"""
+    <style>
+        [data-testid="stButton"] > button:first-child {{
+            border: none;
+        }}
+        div[data-testid="element-container"]:nth-child(5) button {{
+            {division_btn_class.replace('!', '')}
+        }}
+        div[data-testid="element-container"]:nth-child(6) button {{
+            {band_btn_class.replace('!', '')}
+        }}
+        div[data-testid="element-container"]:nth-child(7) button {{
+            {age_btn_class.replace('!', '')}
+        }}
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Calculate attrition metrics by selected category
+    category_attrition = filtered_df.groupby(st.session_state.selected_category).agg(
         Total=('Corp_ID', 'count'),
         Attrition=('Predicted_Attrition', 'sum')
     )
-    band_attrition['Rate'] = (band_attrition['Attrition'] / band_attrition['Total'] * 100).round(1)
-    top_attrition_band = band_attrition.sort_values('Rate', ascending=False).index[
-        0] if not band_attrition.empty else "N/A"
-else:
-    top_attrition_band = "See left panel"
-
-# Most common risk factors
-most_common_factors = []
-for factor in filtered_df['Key_Factors'].str.split(', '):
-    if isinstance(factor, list):
-        most_common_factors.extend(factor)
-
-if most_common_factors:
-    from collections import Counter
-
-    top_factor = Counter(most_common_factors).most_common(1)[0][0]
-else:
-    top_factor = "No significant factors identified"
-
-with col1:
-    st.info(
-        f"**{top_attrition_division} {category_names[selected_category_index]}**\n\n"
-        f"Highest attrition risk at {top_attrition_rate:.1f}%. "
-        f"Consider targeted retention interviews and career development reviews."
+    category_attrition['Rate'] = (category_attrition['Attrition'] / category_attrition['Total'] * 100).round(1)
+    category_attrition = category_attrition.reset_index().sort_values('Rate', ascending=False)
+    
+    # Create visualization
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    
+    fig.add_trace(
+        go.Bar(
+            x=category_attrition[st.session_state.selected_category],
+            y=category_attrition['Attrition'],
+            name="Predicted Attrition",
+            marker_color='#8884d8'
+        )
     )
+    
+    fig.add_trace(
+        go.Scatter(
+            x=category_attrition[st.session_state.selected_category],
+            y=category_attrition['Rate'],
+            name="Attrition Rate (%)",
+            mode='lines+markers',
+            marker_color='#82ca9d',
+            line=dict(width=2)
+        ),
+        secondary_y=True
+    )
+    
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=10, b=20),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        height=240
+    )
+    
+    fig.update_yaxes(title_text="Number of Employees", secondary_y=False)
+    fig.update_yaxes(title_text="Attrition Rate (%)", secondary_y=True)
+    
+    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
-    st.info(
-        f"**{top_attrition_band} Band Employees**\n\n"
-        f"Focus on career progression clarity and address growth opportunities. "
-        f"Review compensation competitiveness for this band."
-    )
+    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+    st.markdown("<h2>Top 5 High-Risk Employees</h2>", unsafe_allow_html=True)
+    
+    high_risk_employees = filtered_df[filtered_df['Risk_Category'] == 'High'].sort_values('Attrition_Risk', ascending=False).head(5)
+    
+    if not high_risk_employees.empty:
+        # Create a custom table with styling to match React
+        table_html = """
+        <table style="width:100%; border-collapse: collapse; font-size: 0.875rem;" class="risk-table">
+          <thead style="background-color: #F3F4F6;">
+            <tr>
+              <th style="padding: 0.5rem 0.75rem; text-align: left; font-size: 0.75rem; font-weight: 500; color: #6B7280; text-transform: uppercase;">ID</th>
+              <th style="padding: 0.5rem 0.75rem; text-align: left; font-size: 0.75rem; font-weight: 500; color: #6B7280; text-transform: uppercase;">Risk Score</th>
+              <th style="padding: 0.5rem 0.75rem; text-align: left; font-size: 0.75rem; font-weight: 500; color: #6B7280; text-transform: uppercase;">Division</th>
+              <th style="padding: 0.5rem 0.75rem; text-align: left; font-size: 0.75rem; font-weight: 500; color: #6B7280; text-transform: uppercase;">Band</th>
+              <th style="padding: 0.5rem 0.75rem; text-align: left; font-size: 0.75rem; font-weight: 500; color: #6B7280; text-transform: uppercase;">Key Factors</th>
+            </tr>
+          </thead>
+          <tbody>
+        """
+        
+        for i, row in enumerate(high_risk_employees.itertuples()):
+            bg_color = '#F9FAFB' if i % 2 == 0 else 'white'
+            risk_color = '#DC2626' if row.Attrition_Risk > 0.85 else '#F97316'
+            risk_width = min(row.Attrition_Risk * 100, 100)
+            
+            table_html += f"""
+            <tr style="background-color: {bg_color};">
+              <td style="padding: 0.5rem 0.75rem; font-weight: 500; color: #111827;">{row.Corp_ID}</td>
+              <td style="padding: 0.5rem 0.75rem; color: #111827;">
+                <div style="display: flex; align-items: center;">
+                  <span style="margin-right: 0.5rem;">{row.Attrition_Risk:.2f}</span>
+                  <div style="width: 4rem; background-color: #E5E7EB; border-radius: 9999px; height: 0.5rem;">
+                    <div style="background-color: {risk_color}; height: 0.5rem; border-radius: 9999px; width: {risk_width}%;"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="padding: 0.5rem 0.75rem; color: #111827;">{row.Company_Division}</td>
+              <td style="padding: 0.5rem 0.75rem; color: #111827;">{row.Band}</td>
+              <td style="padding: 0.5rem 0.75rem; color: #111827;">{row.Key_Factors}</td>
+            </tr>
+            """
+        
+        table_html += """
+          </tbody>
+        </table>
+        """
+        
+        st.markdown(table_html, unsafe_allow_html=True)
+    else:
+        st.info("No high-risk employees match the current filters.")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
-with col3:
-    st.info(
-        f"**Address: {top_factor}**\n\n"
-        f"This is the most common risk factor in the current selection. "
-        f"Develop organization-wide initiatives to address this specific challenge."
-    )
+# Add action recommendations section - match React style
+st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+st.markdown("<h2>Recommended Actions</h2>", unsafe_allow_html=True)
+
+rec_cols = st.columns(3)
+
+# Get top division with highest attrition
+top_attrition_division = "Sales"
+if not category_attrition.empty and st.session_state.selected_category == 'Company_Division':
+    top_attrition_division = category_attrition.iloc[0][st.session_state.selected_category]
+
+# Get top band with highest attrition
+top_attrition_band = "BZ"
+band_attrition = filtered_df.groupby('Band').agg(
+    Total=('Corp_ID', 'count'),
+    Attrition=('Predicted_Attrition', 'sum')
+)
+if not band_attrition.empty:
+    band_attrition['Rate'] = (band_attrition['Attrition'] / band_attrition['Total'] * 100).round(1)
+    band_attrition = band_attrition.sort_values('Rate', ascending=False)
+    if not band_attrition.empty:
+        top_attrition_band = band_attrition.index[0]
+
+with rec_cols[0]:
+    st.markdown("""
+    <div class="recommendation">
+        <h3>Sales Division</h3>
+        <p>Highest attrition risk. Focus on improving Role Stability and managing Career Velocity expectations.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with rec_cols[1]:
+    st.markdown(f"""
+    <div class="recommendation">
+        <h3>{top_attrition_band} Band Employees</h3>
+        <p>Develop clear career progression paths and reduce employment complexity for early-career staff.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with rec_cols[2]:
+    st.markdown("""
+    <div class="recommendation">
+        <h3>Technology Team</h3>
+        <p>Review Career Growth Scores and implement targeted retention plans for high-risk, high-value contributors.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Footer
 st.markdown("---")
 st.markdown(
-    "**Note:** This dashboard uses predictive modeling to identify attrition risks. "
-    "All predictions should be verified with qualitative assessment before taking action."
+    '<p style="font-size: 0.875rem; color: #6B7280; text-align: center;">'
+    'This dashboard uses predictive modeling to identify attrition risks. '
+    'All predictions should be verified with qualitative assessment before taking action.'
+    '</p>',
+    unsafe_allow_html=True
 )
