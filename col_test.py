@@ -618,10 +618,8 @@ with tab2:
         'total_benefits'] * 100).round(1) if compare_2023['total_benefits'] > 0 else 0
     growth_total = ((compare_2024['total_cost'] - compare_2023['total_cost']) / compare_2023['total_cost'] * 100).round(
         1)
-    growth_fte = ((compare_2024['total_fte'] - compare_2023['total_fte']) / compare_2023['total_fte'] * 100).round(1) if
-    compare_2023['total_fte'] > 0 else 0
-    growth_fte_cost = ((compare_2024['fte_costs'] - compare_2023['fte_costs']) / compare_2023['fte_costs'] * 100).round(
-        1) if compare_2023['fte_costs'] > 0 else 0
+    growth_fte = ((compare_2024['total_fte'] - compare_2023['total_fte']) / compare_2023['total_fte'] * 100).round(1) if compare_2023['total_fte'] > 0 else 0
+    growth_fte_cost = ((compare_2024['fte_costs'] - compare_2023['fte_costs']) / compare_2023['fte_costs'] * 100).round(1) if compare_2023['fte_costs'] > 0 else 0
 
     # Create comparison data for chart
     compare_data = {
