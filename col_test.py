@@ -766,71 +766,70 @@ with tab2:
 
     # Subtab 1: Department Analysis
     with subtab1:
-        if
-    'department' in analysis_df.columns:
-    # Group by department
-    dept_analysis = analysis_df.groupby('department').agg({
-        'Corp ID': 'count',
-        'CoL: FTE/AWF': 'sum',
-        'REG PAY 1': 'sum',
-        'OT PAY': 'sum',
-        'Premium Hours': 'sum',
-        'Reg.Bonus': 'sum',
-        'Performance Bonus': 'sum',
-        'Gross Amount': 'sum'
-    }).reset_index()
+        if 'department' in analysis_df.columns:
+            # Group by department
+            dept_analysis = analysis_df.groupby('department').agg({
+                'Corp ID': 'count',
+                'CoL: FTE/AWF': 'sum',
+                'REG PAY 1': 'sum',
+                'OT PAY': 'sum',
+                'Premium Hours': 'sum',
+                'Reg.Bonus': 'sum',
+                'Performance Bonus': 'sum',
+                'Gross Amount': 'sum'
+            }).reset_index()
 
-    # Rename columns
-    dept_analysis.columns = [
-        'Department', 'Employee Count', 'FTE', 'Base Salary', 'Overtime',
-        'Premiums', 'Regular Bonus', 'Performance Bonus', 'Gross Amount'
-    ]
-
-    # Calculate average cost per FTE
-    dept_analysis['Cost per FTE'] = dept_analysis['Gross Amount'] / dept_analysis['FTE']
-
-    # Sort by Gross Amount
-    dept_analysis = dept_analysis.sort_values('Gross Amount', ascending=False)
-
-    # Create department bar chart
-    fig = px.bar(
-        dept_analysis,
-        x='Department',
-        y='Gross Amount',
-        color='Cost per FTE',
-        color_continuous_scale='Blues',
-        title='Department Cost Analysis',
-        labels={'Department': 'Department', 'Gross Amount': 'Total Cost', 'Cost per FTE': 'Cost per FTE ($)'}
-    )
-    fig.update_layout(height=500)
-    st.plotly_chart(fig, use_container_width=True)
-
-    # Format numeric columns for display
-    for col in ['Base Salary', 'Overtime', 'Premiums', 'Regular Bonus', 'Performance Bonus', 'Gross Amount',
-                'Cost per FTE']:
-        dept_analysis[col] = dept_analysis[col].apply(format_currency)
-
-    # Display the detailed table
-    st.dataframe(dept_analysis)
-
-    # Add a download button for the data
-    @ st.cache_data
-
-
-    def convert_df_to_csv(df):
-        return df.to_csv(index=False).encode('utf-8')
-
-
-    csv = convert_df_to_csv(dept_analysis)
-    st.download_button(
-        "Download Department Analysis",
-        csv,
-        f"department_analysis_{selected_year}.csv",
-        "text/csv",
-        key='download-dept-csv'
-    )
-else:
-st.warning("Department information is not available in the dataset.")
+            # Rename columns
+            dept_analysis.columns = [
+                'Department', 'Employee Count', 'FTE', 'Base Salary', 'Overtime',
+                'Premiums', 'Regular Bonus', 'Performance Bonus', 'Gross Amount'
+            ]
+        
+            # Calculate average cost per FTE
+            dept_analysis['Cost per FTE'] = dept_analysis['Gross Amount'] / dept_analysis['FTE']
+        
+            # Sort by Gross Amount
+            dept_analysis = dept_analysis.sort_values('Gross Amount', ascending=False)
+        
+            # Create department bar chart
+            fig = px.bar(
+                dept_analysis,
+                x='Department',
+                y='Gross Amount',
+                color='Cost per FTE',
+                color_continuous_scale='Blues',
+                title='Department Cost Analysis',
+                labels={'Department': 'Department', 'Gross Amount': 'Total Cost', 'Cost per FTE': 'Cost per FTE ($)'}
+            )
+            fig.update_layout(height=500)
+            st.plotly_chart(fig, use_container_width=True)
+        
+            # Format numeric columns for display
+            for col in ['Base Salary', 'Overtime', 'Premiums', 'Regular Bonus', 'Performance Bonus', 'Gross Amount',
+                        'Cost per FTE']:
+                dept_analysis[col] = dept_analysis[col].apply(format_currency)
+        
+            # Display the detailed table
+            st.dataframe(dept_analysis)
+        
+            # Add a download button for the data
+            @ st.cache_data
+        
+        
+            def convert_df_to_csv(df):
+                return df.to_csv(index=False).encode('utf-8')
+        
+        
+            csv = convert_df_to_csv(dept_analysis)
+            st.download_button(
+                "Download Department Analysis",
+                csv,
+                f"department_analysis_{selected_year}.csv",
+                "text/csv",
+                key='download-dept-csv'
+            )
+        else:
+        st.warning("Department information is not available in the dataset.")
 
 # Subtab 2: Band Analysis
 with subtab2:
