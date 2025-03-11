@@ -829,7 +829,7 @@ with tab2:
                 key='download-dept-csv'
             )
         else:
-        st.warning("Department information is not available in the dataset.")
+            st.warning("Department information is not available in the dataset.")
 
 # Subtab 2: Band Analysis
 with subtab2:
