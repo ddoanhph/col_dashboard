@@ -350,7 +350,7 @@ def load_data():
         df_2023['Sick Hours'] = np.random.normal(40, 10, num_employees)
         df_2023['Vac & PTO Hours'] = np.random.normal(80, 20, num_employees)
         df_2023['Holiday Hrs'] = 80
-        df_2023['STD Hours'] = df_2023['STD Hours'].clip(0, 200) 
+        df_2023['STD Hours'] = np.random.normal(50, 10, num_employees) 
         df_2023['Other Absences'] = np.random.normal(30, 10, num_employees)
 
 
