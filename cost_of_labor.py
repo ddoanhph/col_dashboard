@@ -580,15 +580,12 @@ with tab2:
         yaxis=dict(
             title="Amount ($)",
             # Corrected: Use titlefont=dict(color=...)
-            titlefont=dict(color='#2563EB'),
             tickfont=dict(color='#2563EB'), # Keep tickfont styling separate
             tickprefix="$",
             tickformat=","
         ),
         yaxis2=dict(
             title="Growth Rate (%)",
-            # Corrected: Use titlefont=dict(color=...)
-            titlefont=dict(color='#FF8C00'),
             tickfont=dict(color='#FF8C00'), # Keep tickfont styling separate
             overlaying='y', # Overlay on the primary y-axis
             side='right',   # Position on the right
