@@ -468,250 +468,138 @@ with tab1:
         st.markdown('</div>', unsafe_allow_html=True)
 
 # Tab 2: Year-over-Year Comparison
-
+# Tab 2: Year-over-Year Comparison
 with tab2:
     st.markdown('<div class="sub-header">Year-over-Year Comparison</div>', unsafe_allow_html=True)
 
-    # Create comparison data
+    # Create comparison data
+    if selected_dept != "All Departments":
+        compare_2023 = dept_totals_2023
+        compare_2024 = dept_totals_2024
+    else:
+        compare_2023 = totals_2023
+        compare_2024 = totals_2024
 
-    if selected_dept != "All Departments":
-
-        compare_2023 = dept_totals_2023
-
-        compare_2024 = dept_totals_2024
-
-    else:
-
-        compare_2023 = totals_2023
-
-        compare_2024 = totals_2024
-
-
-
-    # Calculate growth rates
-
-    growth_base = ((compare_2024['total_base_salary'] - compare_2023['total_base_salary']) / compare_2023[
-
-        'total_base_salary'] * 100).round(1)
-
-    growth_premiums = ((compare_2024['total_premiums'] - compare_2023['total_premiums']) / compare_2023[
-
-        'total_premiums'] * 100).round(1)
-
-    growth_bonuses = ((compare_2024['total_bonuses'] - compare_2023['total_bonuses']) / compare_2023[
-
-        'total_bonuses'] * 100).round(1)
-
-    growth_social = ((compare_2024['total_social_contributions'] - compare_2023['total_social_contributions']) /
-
-                     compare_2023['total_social_contributions'] * 100).round(1)
-
-    growth_ltips = (
-
-                (compare_2024['total_ltips'] - compare_2023['total_ltips']) / compare_2023['total_ltips'] * 100).round(
-
-        1)
-
-    growth_total = ((compare_2024['total_cost'] - compare_2023['total_cost']))
-
-    growth_total = ((compare_2024['total_cost'] - compare_2023['total_cost']) / compare_2023['total_cost'] * 100).round(1)
-
-
+    # Calculate growth rates
+    growth_base = ((compare_2024['total_base_salary'] - compare_2023['total_base_salary']) / compare_2023[
+        'total_base_salary'] * 100).round(1)
+    growth_premiums = ((compare_2024['total_premiums'] - compare_2023['total_premiums']) / compare_2023[
+        'total_premiums'] * 100).round(1)
+    growth_bonuses = ((compare_2024['total_bonuses'] - compare_2023['total_bonuses']) / compare_2023[
+        'total_bonuses'] * 100).round(1)
+    growth_social = ((compare_2024['total_social_contributions'] - compare_2023['total_social_contributions']) /
+                       compare_2023['total_social_contributions'] * 100).round(1)
+    growth_ltips = (
+            (compare_2024['total_ltips'] - compare_2023['total_ltips']) / compare_2023['total_ltips'] * 100).round(
+        1)
+    # Corrected growth_total calculation (removed the intermediate assignment)
+    growth_total = ((compare_2024['total_cost'] - compare_2023['total_cost']) / compare_2023['total_cost'] * 100).round(1)
 
 # Create comparison chart
-
 categories = ['Base Salary', 'Premiums', 'Bonuses', 'Social Contributions', 'LTIPs', 'Total Cost']
 
-
-
 year_2023_values = [
-
-    compare_2023['total_base_salary'],
-
-    compare_2023['total_premiums'],
-
-    compare_2023['total_bonuses'],
-
-    compare_2023['total_social_contributions'],
-
-    compare_2023['total_ltips'],
-
-    compare_2023['total_cost']
-
+    compare_2023['total_base_salary'],
+    compare_2023['total_premiums'],
+    compare_2023['total_bonuses'],
+    compare_2023['total_social_contributions'],
+    compare_2023['total_ltips'],
+    compare_2023['total_cost']
 ]
-
-
 
 year_2024_values = [
-
-    compare_2024['total_base_salary'],
-
-    compare_2024['total_premiums'],
-
-    compare_2024['total_bonuses'],
-
-    compare_2024['total_social_contributions'],
-
-    compare_2024['total_ltips'],
-
-    compare_2024['total_cost']
-
+    compare_2024['total_base_salary'],
+    compare_2024['total_premiums'],
+    compare_2024['total_bonuses'],
+    compare_2024['total_social_contributions'],
+    compare_2024['total_ltips'],
+    compare_2024['total_cost']
 ]
-
-
 
 growth_rates = [
-
-    growth_base,
-
-    growth_premiums,
-
-    growth_bonuses,
-
-    growth_social,
-
-    growth_ltips,
-
-    growth_total
-
+    growth_base,
+    growth_premiums,
+    growth_bonuses,
+    growth_social,
+    growth_ltips,
+    growth_total
 ]
 
-
-
 # Create grouped bar chart
-
 fig = go.Figure()
 
-
-
 fig.add_trace(go.Bar(
-
-    x=categories,
-
-    y=year_2023_values,
-
-    name='2023',
-
-    marker_color='#93C5FD'
-
+    x=categories,
+    y=year_2023_values,
+    name='2023',
+    marker_color='#93C5FD'
 ))
 
-
-
 fig.add_trace(go.Bar(
-
-    x=categories,
-
-    y=year_2024_values,
-
-    name='2024',
-
-    marker_color='#2563EB'
-
+    x=categories,
+    y=year_2024_values,
+    name='2024',
+    marker_color='#2563EB'
 ))
-
-
 
 # Add 2025 projections if selected
-
 if selected_year == "2025 (Projected)":
+    year_2025_values = [
+        projected_totals['total_base_salary'],
+        projected_totals['total_premiums'],
+        projected_totals['total_bonuses'],
+        projected_totals['total_social_contributions'],
+        projected_totals['total_ltips'],
+        projected_totals['total_cost']
+    ]
 
-    year_2025_values = [
-
-        projected_totals['total_base_salary'],
-
-        projected_totals['total_premiums'],
-
-        projected_totals['total_bonuses'],
-
-        projected_totals['total_social_contributions'],
-
-        projected_totals['total_ltips'],
-
-        projected_totals['total_cost']
-
-    ]
-
-
-
-    fig.add_trace(go.Bar(
-
-        x=categories,
-
-        y=year_2025_values,
-
-        name='2025 (Projected)',
-
-        marker_color='#1E3A8A'
-
-    ))
-
-
+    fig.add_trace(go.Bar(
+        x=categories,
+        y=year_2025_values,
+        name='2025 (Projected)',
+        marker_color='#1E3A8A'
+    ))
 
 fig.update_layout(
-
-    title="Cost Comparison Between Years",
-
-    xaxis_title="Cost Category",
-
-    yaxis_title="Amount ($)",
-
-    legend_title="Year",
-
-    barmode='group',
-
-    height=500
-
+    title="Cost Comparison Between Years",
+    xaxis_title="Cost Category",
+    yaxis_title="Amount ($)",
+    legend_title="Year",
+    barmode='group',
+    height=500
 )
 
-
-
 # Add dollar sign formatting to y-axis
-
 fig.update_yaxes(tickprefix="$", tickformat=",")
-
-
 
 st.plotly_chart(fig, use_container_width=True)
 
-
-
 # Display growth rates in a table
-
 growth_data = {
-
-    'Category': categories,
-
-    '2023 Amount': [format_currency(val) for val in year_2023_values],
-
-    '2024 Amount': [format_currency(val) for val in year_2024_values],
-
-    '2023-2024 Growth': [f"{rate}%" for rate in growth_rates]
-
+    'Category': categories,
+    '2023 Amount': [format_currency(val) for val in year_2023_values],
+    '2024 Amount': [format_currency(val) for val in year_2024_values],
+    '2023-2024 Growth': [f"{rate}%" for rate in growth_rates]
 }
 
-
-
 if selected_year == "2025 (Projected)":
+    # Calculate 2024-2025 growth rates
+    # Ensure keys match the structure of projected_totals and compare_2024
+    keys_for_growth = ['total_base_salary', 'total_premiums', 'total_bonuses',
+                       'total_social_contributions', 'total_ltips', 'total_cost']
+    growth_2025 = []
+    for key in keys_for_growth:
+        # Add a check for division by zero if 2024 value could be 0
+        if compare_2024[key] != 0:
+            rate = (projected_totals[key] - compare_2024[key]) / compare_2024[key] * 100
+            growth_2025.append(rate)
+        else:
+            growth_2025.append(float('inf') if projected_totals[key] > 0 else 0) # Handle division by zero
 
-    # Calculate 2024-2025 growth rates
-
-    growth_2025 = [(projected_totals[key] - compare_2024[key]) / compare_2024[key] * 100
-
-                   for key in ['total_base_salary', 'total_premiums', 'total_bonuses',
-
-                               'total_social_contributions', 'total_ltips', 'total_cost']]
-
-
-
-    growth_data['2025 Amount (Projected)'] = [format_currency(val) for val in year_2025_values]
-
-    growth_data['2024-2025 Growth (Projected)'] = [f"{rate:.1f}%" for rate in growth_2025]
-
-
+    growth_data['2025 Amount (Projected)'] = [format_currency(val) for val in year_2025_values]
+    growth_data['2024-2025 Growth (Projected)'] = [f"{rate:.1f}%" if rate != float('inf') else "Inf%" for rate in growth_2025]
 
 growth_df = pd.DataFrame(growth_data)
-
 st.table(growth_df)
     
 # Tab 3: Detailed Analysis
