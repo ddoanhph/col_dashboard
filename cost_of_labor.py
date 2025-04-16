@@ -573,26 +573,33 @@ with tab2:
             hovertemplate='%{x}: %{y:.1f}%<extra>24-25 Proj. Growth</extra>'
         ))
 
-    # Update Layout for Dual Axes
+    # --- Update Layout for Dual Axes ---
     fig.update_layout(
         title="Cost Comparison Between Years (Bars) and Growth Rate (Lines)",
         xaxis_title="Cost Category",
         yaxis=dict(
-            title="Amount ($)", titlefont_color='#2563EB', tickfont_color='#2563EB',
-            tickprefix="$", tickformat=","
+            title="Amount ($)",
+            # Corrected: Use titlefont=dict(color=...)
+            titlefont=dict(color='#2563EB'),
+            tickfont=dict(color='#2563EB'), # Keep tickfont styling separate
+            tickprefix="$",
+            tickformat=","
         ),
         yaxis2=dict(
-            title="Growth Rate (%)", titlefont_color='#FF8C00', tickfont_color='#FF8C00',
-            overlaying='y', side='right', ticksuffix="%",
-            showgrid=False, # Hide secondary grid lines
-            # Optionally set range if Inf values make auto-range too large
-            # range=[-50, 100] # Example fixed range
+            title="Growth Rate (%)",
+            # Corrected: Use titlefont=dict(color=...)
+            titlefont=dict(color='#FF8C00'),
+            tickfont=dict(color='#FF8C00'), # Keep tickfont styling separate
+            overlaying='y', # Overlay on the primary y-axis
+            side='right',   # Position on the right
+            ticksuffix="%",
+            showgrid=False # Hide grid lines for secondary axis to reduce clutter
         ),
         legend_title="Metric",
         barmode='group',
-        height=550,
-        hovermode='x unified',
-        legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5)
+        height=550, # Slightly taller to accommodate legend and axes
+        hovermode='x unified', # Show hover info for all traces at once
+        legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5) # Legend below chart
     )
 
     st.plotly_chart(fig, use_container_width=True)
