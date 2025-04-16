@@ -470,7 +470,8 @@ with tab1:
 # Tab 2: Year-over-Year Comparison
 
 with tab2:
-    st.markdown('<div class="sub-header">Year-over-Year Comparison</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Year-over-Year Comparison</div>', unsafe_allow_html=True)
+
     # Create comparison data
 
     if selected_dept != "All Departments":
