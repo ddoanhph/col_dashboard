@@ -16,59 +16,77 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Apply custom CSS for better styling
 st.markdown("""
 <style>
     .main-header {
         font-size: 2.5rem;
         font-weight: 700;
-        color: #1E3A8A;
-        margin-bottom: 1.5rem;
+        color: #1E3A8A; /* Dark Blue */
+        margin-bottom: 0.5rem; /* Reduced bottom margin */
     }
     .sub-header {
         font-size: 1.5rem;
         font-weight: 600;
-        color: #2563EB;
-        margin-top: 1.5rem;
-        margin-bottom: 0.75rem;
+        color: #2563EB; /* Medium Blue */
+        margin-top: 1.5rem; /* Increased top margin */
+        margin-bottom: 0.75rem; /* Increased bottom margin */
+        border-bottom: 2px solid #DBEAFE; /* Light blue underline */
+        padding-bottom: 0.25rem;
     }
     .metric-card {
-        background-color: #FFFFFF;
-        border-radius: 0.5rem;
-        padding: 1.25rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border: 1px solid #E5E7EB;
+        background-color: #FFFFFF; /* White background */
+        border-radius: 8px; /* Slightly more rounded corners */
+        padding: 1.25rem; /* Increased padding */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Softer shadow */
+        border: 1px solid #E5E7EB; /* Light grey border */
+        margin-bottom: 1rem; /* Add space below each card */
+        height: 100%; /* Make cards in a row the same height */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Pushes label down if needed */
     }
     .metric-value {
-        font-size: 2rem;
+        font-size: 2rem; /* Slightly larger value */
         font-weight: 700;
-        color: #1E3A8A;
-        margin-bottom: 0.25rem;
+        color: #1E3A8A; /* Dark Blue */
+        line-height: 1.2; /* Adjust line height */
+        margin-bottom: 0.25rem; /* Space between value and label */
     }
     .metric-label {
-        font-size: 1.1rem;
-        color: #4B5563;
+        font-size: 0.95rem; /* Slightly smaller label */
+        color: #4B5563; /* Grey text */
+        font-weight: 500; /* Medium weight */
     }
     .highlight {
-        background-color: #DBEAFE;
-        padding: 0.75rem;
-        border-radius: 0.3rem;
-        border-left: 6px solid #2563EB;
+        background-color: #EFF6FF; /* Lighter blue highlight */
+        padding: 1rem;
+        border-radius: 0.5rem;
+        border-left: 5px solid #2563EB; /* Thicker blue border */
         margin-top: 1rem;
-        margin-bottom: 1rem;
     }
-    /* Target column backgrounds */
-    .st-emotion-cache-16txtl3 { /* This targets the column container */
-        background-color: transparent !important;
+    /* Add some general spacing */
+    .main .block-container {
+        padding-top: 2rem; /* Add padding at the top of the main container */
     }
-    .st-emotion-cache-z5fcl4 { /* This targets the inner column content */
-        background-color: transparent !important;
+    /* Style Streamlit's default metric component if you ever use it */
+    div[data-testid="stMetric"] {
+       background-color: #FFFFFF;
+       border: 1px solid #E5E7EB;
+       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+       padding: 1rem;
+       border-radius: 8px;
     }
-    /* Add a subtle green arrow for positive growth in the comparison table */
-    .positive-growth {
-        color: green;
+    div[data-testid="stMetric"] > label { /* Target the label */
+        font-weight: 500;
+        color: #4B5563 !important; /* Override default color */
+    }
+     div[data-testid="stMetric"] > div { /* Target the value div */
+        color: #1E3A8A !important; /* Override default color */
     }
 </style>
 """, unsafe_allow_html=True)
+
 # Helper functions for calculations
 def calculate_totals(df):
     """Calculate total cost metrics from employee data"""
