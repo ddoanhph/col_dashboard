@@ -349,29 +349,33 @@ else:  # 2025 Projected
     else:
         current_totals = projected_totals
 
-# Display main KPIs
 with col1:
-    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-    st.markdown(f'<div class="metric-label">Total Cost of Labor</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="metric-value">{format_currency(current_totals["total_cost"])}</div>',
-                unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown(f'''
+        <div class="metric-card">
+            <div class="metric-value">{format_currency(current_totals["total_cost"])}</div>
+            <div class="metric-label">Total Cost of Labor ({selected_year})</div>
+        </div>
+    ''', unsafe_allow_html=True)
 
 with col2:
-    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-    st.markdown(f'<div class="metric-label">Total FTE</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="metric-value">{current_totals["total_fte"]}</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown(f'''
+        <div class="metric-card">
+            <div class="metric-value">{current_totals["total_fte"]}</div>
+            <div class="metric-label">Total FTE ({selected_year})</div>
+        </div>
+    ''', unsafe_allow_html=True)
 
 with col3:
-    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-    st.markdown(f'<div class="metric-label">Cost per FTE</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="metric-value">{format_currency(current_totals["fte_costs"])}</div>',
-                unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown(f'''
+        <div class="metric-card">
+            <div class="metric-value">{format_currency(current_totals["fte_costs"])}</div>
+            <div class="metric-label">Cost per FTE ({selected_year})</div>
+        </div>
+    ''', unsafe_allow_html=True)
+
 
 # Create tabs for different views
-tab1, tab2, tab3 = st.tabs(["Cost Breakdown", "Year-over-Year Comparison", "Detailed Analysis"])
+tab1, tab2, tab3 = st.tabs(["📊 Cost Breakdown", "📈 Year-over-Year", "🔍 Detailed Analysis"])
 
 # Tab 1: Cost Breakdown
 with tab1:
