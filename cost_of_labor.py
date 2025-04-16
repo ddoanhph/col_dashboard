@@ -16,42 +16,45 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Apply custom CSS for better styling
 st.markdown("""
 <style>
     .main-header {
         font-size: 2.5rem;
         font-weight: 700;
         color: #1E3A8A;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem; /* Increased margin for better spacing */
     }
     .sub-header {
         font-size: 1.5rem;
         font-weight: 600;
         color: #2563EB;
-        margin-top: 1rem;
-        margin-bottom: 0.5rem;
+        margin-top: 1.5rem; /* Increased margin for better spacing */
+        margin-bottom: 0.75rem;
     }
     .metric-card {
-        background-color: #F3F4F6;
+        background-color: #FFFFFF; /* Changed background to white */
         border-radius: 0.5rem;
-        padding: 1rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 1.25rem; /* Slightly increased padding */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow */
+        border: 1px solid #E5E7EB; /* Added a subtle border */
     }
     .metric-value {
-        font-size: 1.8rem;
+        font-size: 2rem; /* Slightly increased font size */
         font-weight: 700;
         color: #1E3A8A;
+        margin-bottom: 0.25rem; /* Added some bottom margin */
     }
     .metric-label {
-        font-size: 1rem;
+        font-size: 1.1rem; /* Slightly increased font size */
         color: #4B5563;
     }
     .highlight {
         background-color: #DBEAFE;
-        padding: 0.5rem;
-        border-radius: 0.25rem;
-        border-left: 4px solid #2563EB;
+        padding: 0.75rem; /* Slightly increased padding */
+        border-radius: 0.3rem;
+        border-left: 6px solid #2563EB; /* Slightly thicker highlight bar */
+        margin-top: 1rem; /* Added top margin */
+        margin-bottom: 1rem; /* Added bottom margin */
     }
 </style>
 """, unsafe_allow_html=True)
