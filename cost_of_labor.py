@@ -468,180 +468,254 @@ with tab1:
         st.markdown('</div>', unsafe_allow_html=True)
 
 # Tab 2: Year-over-Year Comparison
+
 with tab2:
-    st.markdown('<div class="sub-header">Year-over-Year Comparison</div>', unsafe_allow_html=True)
 
-    # --- Data Preparation ---
-    if selected_dept != "All Departments":
-        # Use totals filtered by department
-        compare_2023 = dept_totals_2023
-        compare_2024 = dept_totals_2024
-        # For 2025, we'll use the 'current_totals' calculated earlier,
-        # which already accounts for department filtering and new hires
-        compare_2025 = current_totals # Use pre-calculated current_totals
-    else:
-        # Use global totals
-        compare_2023 = totals_2023
-        compare_2024 = totals_2024
-        compare_2025 = projected_totals # Use pre-calculated projected_totals
-
-    metrics_keys = [
-        'total_base_salary', 'total_premiums', 'total_bonuses',
-        'total_social_contributions', 'total_ltips', 'total_cost'
-    ]
-    categories = ['Base Salary', 'Premiums', 'Bonuses', 'Social Contributions', 'LTIPs', 'Total Cost']
-
-    # Extract values safely using .get() with a default of 0
-    year_2023_values = [compare_2023.get(key, 0) for key in metrics_keys]
-    year_2024_values = [compare_2024.get(key, 0) for key in metrics_keys]
-    year_2025_values = []
-    if selected_year == "2025 (Projected)":
-        year_2025_values = [compare_2025.get(key, 0) for key in metrics_keys]
+    st.markdown('<div class="sub-header">Year-over-Year Comparison</div>', unsafe_allow_html=True)
 
 
-    # --- Robust Growth Rate Calculation ---
-    def safe_growth_rate(new_val, old_val):
-        """Calculates growth rate safely, handling old_val=0."""
-        if old_val == 0:
-            if new_val == 0:
-                return 0.0 # No change from zero
-            else:
-                return np.inf # Grew from zero (infinite percentage growth)
-        elif pd.isna(old_val) or pd.isna(new_val):
-             return np.nan # Handle potential NaN inputs
-        else:
-            return ((new_val - old_val) / old_val) * 100
 
-    growth_rates_23_24_numeric = [
-        safe_growth_rate(year_2024_values[i], year_2023_values[i])
-        for i in range(len(metrics_keys))
-    ]
+    # Create comparison data
 
-    growth_rates_24_25_numeric = []
-    if selected_year == "2025 (Projected)":
-        growth_rates_24_25_numeric = [
-            safe_growth_rate(year_2025_values[i], year_2024_values[i])
-            for i in range(len(metrics_keys))
-        ]
+    if selected_dept != "All Departments":
 
-    # --- Create Combined Bar and Line Chart ---
-    fig = go.Figure()
+        compare_2023 = dept_totals_2023
 
-    # Add Bar Traces
-    fig.add_trace(go.Bar(
-        x=categories, y=year_2023_values, name='2023 Amount',
-        marker_color='#93C5FD', # Light Blue
-        hovertemplate='%{x}: $%{y:,.2f}<extra>2023</extra>'
-    ))
-    fig.add_trace(go.Bar(
-        x=categories, y=year_2024_values, name='2024 Amount',
-        marker_color='#2563EB', # Medium Blue
-        hovertemplate='%{x}: $%{y:,.2f}<extra>2024</extra>'
-    ))
-    if selected_year == "2025 (Projected)":
-        fig.add_trace(go.Bar(
-            x=categories, y=year_2025_values, name='2025 Projected',
-            marker_color='#1E3A8A', # Dark Blue
-            hovertemplate='%{x}: $%{y:,.2f}<extra>2025 Projected</extra>'
-        ))
+        compare_2024 = dept_totals_2024
 
-    # Add Line Trace for 2023-2024 Growth Rate on Secondary Axis
-    # Replace np.inf with None for plotting, as Plotly doesn't plot None values
-    y_plot_23_24 = [rate if rate != np.inf else None for rate in growth_rates_23_24_numeric]
-    fig.add_trace(go.Scatter(
-        x=categories,
-        y=y_plot_23_24,
-        name='23-24 Growth %',
-        mode='lines+markers',
-        yaxis='y2', # Assign to secondary y-axis
-        line=dict(color='#FF8C00', width=3, dash='dot'), # Dark Orange line
-        marker=dict(size=8),
-        hovertemplate='%{x}: %{y:.1f}%<extra>23-24 Growth</extra>' # Use raw y value here
-    ))
+    else:
 
-    # Add Line Trace for 2024-2025 Growth Rate (if applicable)
-    if selected_year == "2025 (Projected)":
-        y_plot_24_25 = [rate if rate != np.inf else None for rate in growth_rates_24_25_numeric]
-        fig.add_trace(go.Scatter(
-            x=categories,
-            y=y_plot_24_25,
-            name='24-25 Proj. Growth %',
-            mode='lines+markers',
-            yaxis='y2',
-            line=dict(color='#D81B60', width=3, dash='dash'), # Pink line
-            marker=dict(size=8, symbol='star'),
-            hovertemplate='%{x}: %{y:.1f}%<extra>24-25 Proj. Growth</extra>'
-        ))
+        compare_2023 = totals_2023
 
-    # --- Update Layout for Dual Axes ---
-    fig.update_layout(
-        title="Cost Comparison Between Years (Bars) and Growth Rate (Lines)",
-        xaxis_title="Cost Category",
-        yaxis=dict(
-            title="Amount ($)",
-            # Corrected: Use titlefont=dict(color=...)
-            tickfont=dict(color='#2563EB'), # Keep tickfont styling separate
-            tickprefix="$",
-            tickformat=","
-        ),
-        yaxis2=dict(
-            title="Growth Rate (%)",
-            tickfont=dict(color='#FF8C00'), # Keep tickfont styling separate
-            overlaying='y', # Overlay on the primary y-axis
-            side='right',   # Position on the right
-            ticksuffix="%",
-            showgrid=False # Hide grid lines for secondary axis to reduce clutter
-        ),
-        legend_title="Metric",
-        barmode='group',
-        height=550, # Slightly taller to accommodate legend and axes
-        hovermode='x unified', # Show hover info for all traces at once
-        legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5) # Legend below chart
-    )
+        compare_2024 = totals_2024
 
-    st.plotly_chart(fig, use_container_width=True)
 
-    # --- Create Table with Trend Arrows ---
-    def format_growth_with_arrow(rate):
-        """Formats growth rate with colored arrows using HTML."""
-        if pd.isna(rate):
-             return '<span style="color:grey;">N/A</span>'
-        if rate == np.inf:
-            # Represent infinite growth (from zero)
-            return '<span style="color:green;">↑ Inf %</span>'
-        # Define a small threshold for 'no change' arrow
-        threshold = 0.01
-        if rate > threshold:
-            arrow = "↑"
-            color = "green"
-        elif rate < -threshold:
-            arrow = "↓"
-            color = "red"
-        else:
-            arrow = "→"
-            color = "grey"
-        # Format as HTML string
-        return f'<span style="color:{color};">{arrow} {abs(rate):.1f}%</span>'
 
-    # Prepare data dictionary for the table
-    growth_data = {
-        'Category': categories,
-        '2023 Amount': [format_currency(val) for val in year_2023_values],
-        '2024 Amount': [format_currency(val) for val in year_2024_values],
-        '2023-2024 Growth': [format_growth_with_arrow(rate) for rate in growth_rates_23_24_numeric]
-    }
+    # Calculate growth rates
 
-    if selected_year == "2025 (Projected)":
-        growth_data['2025 Amount (Projected)'] = [format_currency(val) for val in year_2025_values]
-        growth_data['2024-2025 Growth (Projected)'] = [format_growth_with_arrow(rate) for rate in growth_rates_24_25_numeric]
+    growth_base = ((compare_2024['total_base_salary'] - compare_2023['total_base_salary']) / compare_2023[
 
-    # Create DataFrame
-    growth_df = pd.DataFrame(growth_data)
+        'total_base_salary'] * 100).round(1)
 
-    # Display table using st.markdown to render HTML colors/arrows correctly
-    st.markdown("### Year-over-Year Growth Details")
-    st.markdown(growth_df.to_html(escape=False, index=False), unsafe_allow_html=True)
-    st.write("")
+    growth_premiums = ((compare_2024['total_premiums'] - compare_2023['total_premiums']) / compare_2023[
+
+        'total_premiums'] * 100).round(1)
+
+    growth_bonuses = ((compare_2024['total_bonuses'] - compare_2023['total_bonuses']) / compare_2023[
+
+        'total_bonuses'] * 100).round(1)
+
+    growth_social = ((compare_2024['total_social_contributions'] - compare_2023['total_social_contributions']) /
+
+                     compare_2023['total_social_contributions'] * 100).round(1)
+
+    growth_ltips = (
+
+                (compare_2024['total_ltips'] - compare_2023['total_ltips']) / compare_2023['total_ltips'] * 100).round(
+
+        1)
+
+    growth_total = ((compare_2024['total_cost'] - compare_2023['total_cost']))
+
+    growth_total = ((compare_2024['total_cost'] - compare_2023['total_cost']) / compare_2023['total_cost'] * 100).round(1)
+
+
+
+# Create comparison chart
+
+categories = ['Base Salary', 'Premiums', 'Bonuses', 'Social Contributions', 'LTIPs', 'Total Cost']
+
+
+
+year_2023_values = [
+
+    compare_2023['total_base_salary'],
+
+    compare_2023['total_premiums'],
+
+    compare_2023['total_bonuses'],
+
+    compare_2023['total_social_contributions'],
+
+    compare_2023['total_ltips'],
+
+    compare_2023['total_cost']
+
+]
+
+
+
+year_2024_values = [
+
+    compare_2024['total_base_salary'],
+
+    compare_2024['total_premiums'],
+
+    compare_2024['total_bonuses'],
+
+    compare_2024['total_social_contributions'],
+
+    compare_2024['total_ltips'],
+
+    compare_2024['total_cost']
+
+]
+
+
+
+growth_rates = [
+
+    growth_base,
+
+    growth_premiums,
+
+    growth_bonuses,
+
+    growth_social,
+
+    growth_ltips,
+
+    growth_total
+
+]
+
+
+
+# Create grouped bar chart
+
+fig = go.Figure()
+
+
+
+fig.add_trace(go.Bar(
+
+    x=categories,
+
+    y=year_2023_values,
+
+    name='2023',
+
+    marker_color='#93C5FD'
+
+))
+
+
+
+fig.add_trace(go.Bar(
+
+    x=categories,
+
+    y=year_2024_values,
+
+    name='2024',
+
+    marker_color='#2563EB'
+
+))
+
+
+
+# Add 2025 projections if selected
+
+if selected_year == "2025 (Projected)":
+
+    year_2025_values = [
+
+        projected_totals['total_base_salary'],
+
+        projected_totals['total_premiums'],
+
+        projected_totals['total_bonuses'],
+
+        projected_totals['total_social_contributions'],
+
+        projected_totals['total_ltips'],
+
+        projected_totals['total_cost']
+
+    ]
+
+
+
+    fig.add_trace(go.Bar(
+
+        x=categories,
+
+        y=year_2025_values,
+
+        name='2025 (Projected)',
+
+        marker_color='#1E3A8A'
+
+    ))
+
+
+
+fig.update_layout(
+
+    title="Cost Comparison Between Years",
+
+    xaxis_title="Cost Category",
+
+    yaxis_title="Amount ($)",
+
+    legend_title="Year",
+
+    barmode='group',
+
+    height=500
+
+)
+
+
+
+# Add dollar sign formatting to y-axis
+
+fig.update_yaxes(tickprefix="$", tickformat=",")
+
+
+
+st.plotly_chart(fig, use_container_width=True)
+
+
+
+# Display growth rates in a table
+
+growth_data = {
+
+    'Category': categories,
+
+    '2023 Amount': [format_currency(val) for val in year_2023_values],
+
+    '2024 Amount': [format_currency(val) for val in year_2024_values],
+
+    '2023-2024 Growth': [f"{rate}%" for rate in growth_rates]
+
+}
+
+
+
+if selected_year == "2025 (Projected)":
+
+    # Calculate 2024-2025 growth rates
+
+    growth_2025 = [(projected_totals[key] - compare_2024[key]) / compare_2024[key] * 100
+
+                   for key in ['total_base_salary', 'total_premiums', 'total_bonuses',
+
+                               'total_social_contributions', 'total_ltips', 'total_cost']]
+
+
+
+    growth_data['2025 Amount (Projected)'] = [format_currency(val) for val in year_2025_values]
+
+    growth_data['2024-2025 Growth (Projected)'] = [f"{rate:.1f}%" for rate in growth_2025]
+
+
+
+growth_df = pd.DataFrame(growth_data)
+
+st.table(growth_df)
     
 # Tab 3: Detailed Analysis
 with tab3:
