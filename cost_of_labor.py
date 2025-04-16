@@ -22,44 +22,53 @@ st.markdown("""
         font-size: 2.5rem;
         font-weight: 700;
         color: #1E3A8A;
-        margin-bottom: 1.5rem; /* Increased margin for better spacing */
+        margin-bottom: 1.5rem;
     }
     .sub-header {
         font-size: 1.5rem;
         font-weight: 600;
         color: #2563EB;
-        margin-top: 1.5rem; /* Increased margin for better spacing */
+        margin-top: 1.5rem;
         margin-bottom: 0.75rem;
     }
     .metric-card {
-        background-color: #FFFFFF; /* Changed background to white */
+        background-color: #FFFFFF;
         border-radius: 0.5rem;
-        padding: 1.25rem; /* Slightly increased padding */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow */
-        border: 1px solid #E5E7EB; /* Added a subtle border */
+        padding: 1.25rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: 1px solid #E5E7EB;
     }
     .metric-value {
-        font-size: 2rem; /* Slightly increased font size */
+        font-size: 2rem;
         font-weight: 700;
         color: #1E3A8A;
-        margin-bottom: 0.25rem; /* Added some bottom margin */
+        margin-bottom: 0.25rem;
     }
     .metric-label {
-        font-size: 1.1rem; /* Slightly increased font size */
+        font-size: 1.1rem;
         color: #4B5563;
     }
     .highlight {
         background-color: #DBEAFE;
-        padding: 0.75rem; /* Slightly increased padding */
+        padding: 0.75rem;
         border-radius: 0.3rem;
-        border-left: 6px solid #2563EB; /* Slightly thicker highlight bar */
-        margin-top: 1rem; /* Added top margin */
-        margin-bottom: 1rem; /* Added bottom margin */
+        border-left: 6px solid #2563EB;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+    /* Target column backgrounds */
+    .st-emotion-cache-16txtl3 { /* This targets the column container */
+        background-color: transparent !important;
+    }
+    .st-emotion-cache-z5fcl4 { /* This targets the inner column content */
+        background-color: transparent !important;
+    }
+    /* Add a subtle green arrow for positive growth in the comparison table */
+    .positive-growth {
+        color: green;
     }
 </style>
 """, unsafe_allow_html=True)
-
-
 # Helper functions for calculations
 def calculate_totals(df):
     """Calculate total cost metrics from employee data"""
