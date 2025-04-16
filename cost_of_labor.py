@@ -379,7 +379,7 @@ with col1:
         <div class="metric-card">
             <div class="metric-value">{format_currency(current_totals["total_cost"])}</div>
             <div class="metric-label-container">
-                 <i class="fas fa-dollar-sign metric-icon"></i> {/* Icon */}
+                 <i class="fas fa-dollar-sign metric-icon"></i>
                  <span class="metric-label">Total Cost of Labor ({selected_year})</span>
             </div>
         </div>
@@ -390,7 +390,7 @@ with col2:
         <div class="metric-card">
             <div class="metric-value">{current_totals["total_fte"]}</div>
              <div class="metric-label-container">
-                 <i class="fas fa-users metric-icon"></i> {/* Icon */}
+                 <i class="fas fa-users metric-icon"></i>
                  <span class="metric-label">Total FTE ({selected_year})</span>
             </div>
         </div>
@@ -401,13 +401,11 @@ with col3:
         <div class="metric-card">
             <div class="metric-value">{format_currency(current_totals["fte_costs"])}</div>
              <div class="metric-label-container">
-                 {/* Using a different icon for variety */}
-                 <i class="fas fa-money-check-alt metric-icon"></i> {/* Icon */}
+                 <i class="fas fa-money-check-alt metric-icon"></i>
                  <span class="metric-label">Cost per FTE ({selected_year})</span>
             </div>
         </div>
     ''', unsafe_allow_html=True)
-
 
 # Create tabs for different views
 tab1, tab2, tab3 = st.tabs(["📊 Cost Breakdown", "📈 Year-over-Year", "🔍 Detailed Analysis"])
