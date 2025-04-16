@@ -19,18 +19,21 @@ st.set_page_config(
 # Apply custom CSS for better styling
 st.markdown("""
 <style>
+    /* Add Font Awesome CDN */
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
     .main-header {
         font-size: 2.5rem;
         font-weight: 700;
         color: #1E3A8A; /* Dark Blue */
-        margin-bottom: 0.5rem; /* Reduced bottom margin */
+        margin-bottom: 0.5rem;
     }
     .sub-header {
         font-size: 1.5rem;
         font-weight: 600;
         color: #2563EB; /* Medium Blue */
-        margin-top: 1.5rem; /* Increased top margin */
-        margin-bottom: 0.75rem; /* Increased bottom margin */
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
         border-bottom: 2px solid #DBEAFE; /* Light blue underline */
         padding-bottom: 0.25rem;
     }
@@ -38,52 +41,71 @@ st.markdown("""
         background-color: #FFFFFF; /* White background */
         border-radius: 8px; /* Slightly more rounded corners */
         padding: 1.25rem; /* Increased padding */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Softer shadow */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Lighter initial shadow */
         border: 1px solid #E5E7EB; /* Light grey border */
-        margin-bottom: 1rem; /* Add space below each card */
+        border-left: 6px solid #2563EB; /* ACCENT BORDER - Medium Blue */
+        margin-bottom: 1rem; /* Space below each card */
         height: 100%; /* Make cards in a row the same height */
         display: flex;
         flex-direction: column;
-        justify-content: space-between; /* Pushes label down if needed */
+        justify-content: space-between;
+        transition: all 0.2s ease-in-out; /* Smooth transition for hover */
     }
+
+    /* HOVER EFFECT */
+    .metric-card:hover {
+        box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1); /* Deeper shadow on hover */
+        transform: translateY(-4px); /* Slight lift effect */
+        border-left-color: #1E3A8A; /* Darken accent border on hover */
+    }
+
     .metric-value {
-        font-size: 2rem; /* Slightly larger value */
+        font-size: 2.1rem; /* Slightly larger value */
         font-weight: 700;
         color: #1E3A8A; /* Dark Blue */
-        line-height: 1.2; /* Adjust line height */
-        margin-bottom: 0.25rem; /* Space between value and label */
+        line-height: 1.2;
+        margin-bottom: 0.5rem; /* More space before label */
     }
+
+    /* Container for label and icon */
+    .metric-label-container {
+        display: flex;
+        align-items: center; /* Vertically align icon and text */
+        gap: 0.6rem;       /* Space between icon and text */
+    }
+
     .metric-label {
-        font-size: 0.95rem; /* Slightly smaller label */
+        font-size: 0.95rem;
         color: #4B5563; /* Grey text */
-        font-weight: 500; /* Medium weight */
+        font-weight: 500;
+        margin: 0; /* Remove default margins */
     }
+
+    /* Icon Style */
+    .metric-icon {
+        color: #6B7280; /* Icon color - Medium Grey */
+        font-size: 1.2rem; /* Adjust icon size */
+        width: 20px; /* Give icon a fixed width for alignment */
+        text-align: center;
+    }
+
     .highlight {
-        background-color: #EFF6FF; /* Lighter blue highlight */
+        background-color: #EFF6FF;
         padding: 1rem;
         border-radius: 0.5rem;
-        border-left: 5px solid #2563EB; /* Thicker blue border */
+        border-left: 5px solid #2563EB;
         margin-top: 1rem;
     }
-    /* Add some general spacing */
     .main .block-container {
-        padding-top: 2rem; /* Add padding at the top of the main container */
+        padding-top: 2rem;
     }
-    /* Style Streamlit's default metric component if you ever use it */
+    /* Optional: Style default st.metric if used elsewhere */
     div[data-testid="stMetric"] {
-       background-color: #FFFFFF;
-       border: 1px solid #E5E7EB;
-       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-       padding: 1rem;
-       border-radius: 8px;
+       background-color: #FFFFFF; border: 1px solid #E5E7EB;
+       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 1rem; border-radius: 8px;
     }
-    div[data-testid="stMetric"] > label { /* Target the label */
-        font-weight: 500;
-        color: #4B5563 !important; /* Override default color */
-    }
-     div[data-testid="stMetric"] > div { /* Target the value div */
-        color: #1E3A8A !important; /* Override default color */
-    }
+    div[data-testid="stMetric"] > label { font-weight: 500; color: #4B5563 !important; }
+    div[data-testid="stMetric"] > div { color: #1E3A8A !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -349,11 +371,17 @@ else:  # 2025 Projected
     else:
         current_totals = projected_totals
 
+# Main dashboard area - Use the custom markdown approach with icons
+col1, col2, col3 = st.columns(3)
+
 with col1:
     st.markdown(f'''
         <div class="metric-card">
             <div class="metric-value">{format_currency(current_totals["total_cost"])}</div>
-            <div class="metric-label">Total Cost of Labor ({selected_year})</div>
+            <div class="metric-label-container">
+                 <i class="fas fa-dollar-sign metric-icon"></i> {/* Icon */}
+                 <span class="metric-label">Total Cost of Labor ({selected_year})</span>
+            </div>
         </div>
     ''', unsafe_allow_html=True)
 
@@ -361,7 +389,10 @@ with col2:
     st.markdown(f'''
         <div class="metric-card">
             <div class="metric-value">{current_totals["total_fte"]}</div>
-            <div class="metric-label">Total FTE ({selected_year})</div>
+             <div class="metric-label-container">
+                 <i class="fas fa-users metric-icon"></i> {/* Icon */}
+                 <span class="metric-label">Total FTE ({selected_year})</span>
+            </div>
         </div>
     ''', unsafe_allow_html=True)
 
@@ -369,7 +400,11 @@ with col3:
     st.markdown(f'''
         <div class="metric-card">
             <div class="metric-value">{format_currency(current_totals["fte_costs"])}</div>
-            <div class="metric-label">Cost per FTE ({selected_year})</div>
+             <div class="metric-label-container">
+                 {/* Using a different icon for variety */}
+                 <i class="fas fa-money-check-alt metric-icon"></i> {/* Icon */}
+                 <span class="metric-label">Cost per FTE ({selected_year})</span>
+            </div>
         </div>
     ''', unsafe_allow_html=True)
 
