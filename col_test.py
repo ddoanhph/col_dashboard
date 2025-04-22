@@ -498,7 +498,8 @@ with tab1:
     cost_df = cost_df.sort_values(by='Amount', ascending=False).reset_index(drop=True)
 
     # --- Create Layout: Chart and Table Side-by-Side ---
-    col1, col2 = st.columns([0.6, 0.4]) # Adjust ratios as needed (60% chart, 40% table)
+    # Use st.columns(2) for equal width columns
+    col1, col2 = st.columns(2) # MODIFIED: Equal column widths
 
     with col1:
         # --- Create Donut Chart ---
@@ -511,6 +512,7 @@ with tab1:
             hoverinfo='label+percent', # Show label and percentage on hover
             textinfo='percent',       # Show percentage on slices
             texttemplate='%{percent:.1%}', # Format text on slices
+            insidetextorientation='radial', # Improve text readability on smaller slices
             hovertemplate="<b>%{label}</b><br>Amount: %{value:$,.2f}<br>Percentage: %{percent:.1%}<extra></extra>" # Custom hover text
         )])
 
@@ -518,17 +520,17 @@ with tab1:
         fig.add_annotation(
             text=f"Total:<br>{format_currency(total_cost_for_breakdown)}", # Use helper function
             x=0.5, y=0.5, # Center position
-            font_size=16, # Adjust font size
+            font_size=18, # MODIFIED: Slightly larger font for total
             showarrow=False,
             font_color="#1E3A8A" # Match header color
         )
 
         fig.update_layout(
             title=f'Cost Distribution for {selected_year}',
-            legend_title_text='Categories',
-            # Adjust margins if needed
-            margin=dict(t=50, b=0, l=0, r=0),
-            height=450 # Adjust height as needed
+            # legend_title_text='Categories', # No longer needed
+            showlegend=False, # MODIFIED: Hide the legend
+            margin=dict(t=50, b=20, l=20, r=20), # Adjust margins for better spacing
+            height=500 # MODIFIED: Increased height
         )
 
         st.plotly_chart(fig, use_container_width=True)
@@ -543,13 +545,14 @@ with tab1:
                 'Amount': format_currency, # Use your existing helper
                 'Percentage': "{:.1f}%"   # Format percentage with one decimal
             }) \
-            .bar(subset=['Percentage'], color='#93C5FD', vmin=0, vmax=100) # Add data bars
+            .bar(subset=['Percentage'], color='#93C5FD', vmin=0, vmax=100, align='left') # Add data bars aligned left
 
         # Display the styled dataframe
+        # Set height potentially? Streamlit dataframe height is tricky.
         st.dataframe(styled_cost_df, use_container_width=True, hide_index=True) # hide_index is cleaner
 
     # --- Conditional Section for 2025 New Hire Impact ---
-    # (Keep this section as it was, potentially place it below the columns)
+    # (Keep this section as it was, placed below the columns)
     if selected_year == "2025 (Projected)" and num_new_hires > 0:
         # Add a separator
         st.markdown("---")
