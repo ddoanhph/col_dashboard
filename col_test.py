@@ -410,11 +410,69 @@ with col3:
 # Create tabs for different views
 tab1, tab2, tab3 = st.tabs(["📊 Cost Breakdown", "📈 Year-over-Year", "🔍 Detailed Analysis"])
 
+# Tab 1: Cost Breakdown (Original)
+# with tab1:
+#     st.markdown('<div class="sub-header">Cost Breakdown</div>', unsafe_allow_html=True)
+
+#     # Create cost breakdown chart
+#     cost_data = {
+#         'Category': ['Base Salary', 'Premiums', 'Bonuses', 'Social Contributions', 'LTIPs'],
+#         'Amount': [
+#             current_totals['total_base_salary'],
+#             current_totals['total_premiums'],
+#             current_totals['total_bonuses'],
+#             current_totals['total_social_contributions'],
+#             current_totals['total_ltips']
+#         ]
+#     }
+#     cost_df = pd.DataFrame(cost_data)
+
+#     # Calculate percentages
+#     total = cost_df['Amount'].sum()
+#     cost_df['Percentage'] = (cost_df['Amount'] / total * 100).round(1)
+
+#     # Create the chart
+#     fig = px.pie(
+#         cost_df,
+#         values='Amount',
+#         names='Category',
+#         title=f'Cost Distribution for {selected_year}',
+#         color_discrete_sequence=px.colors.sequential.Blues_r,
+#         hover_data=['Percentage']
+#     )
+#     fig.update_traces(textposition='inside', textinfo='percent+label')
+#     fig.update_layout(
+#         height=500,
+#         margin=dict(t=50, b=0, l=0, r=0)
+#     )
+
+#     st.plotly_chart(fig, use_container_width=True)
+
+#     # Display cost breakdown in a table with $ and % columns
+#     cost_df['Amount'] = cost_df['Amount'].apply(format_currency)
+#     cost_df['Percentage'] = cost_df['Percentage'].apply(lambda x: f"{x}%")
+
+#     st.markdown('<div class="sub-header">Cost Breakdown Details</div>', unsafe_allow_html=True)
+#     st.table(cost_df)
+
+#     # Add special section for 2025 with new hire cost
+#     if selected_year == "2025 (Projected)" and num_new_hires > 0:
+#         st.markdown('<div class="highlight">', unsafe_allow_html=True)
+#         st.markdown(f"### New Hire Impact")
+#         st.markdown(f"**Number of New Hires:** {num_new_hires} ({selected_hire_dept}, {selected_band})")
+
+#         if 'hiring_costs' in projected_totals:
+#             st.markdown(f"**Total Hiring Costs:** {format_currency(projected_totals['hiring_costs'])}")
+#             st.markdown(f"**Cost per New Hire:** {format_currency(projected_totals['hiring_costs'] / num_new_hires)}")
+
+#         st.markdown('</div>', unsafe_allow_html=True)
+
 # Tab 1: Cost Breakdown
 with tab1:
-    st.markdown('<div class="sub-header">Cost Breakdown</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Cost Breakdown Analysis</div>', unsafe_allow_html=True) # Slightly updated title
 
-    # Create cost breakdown chart
+    # --- Data Preparation for the Chart and Table ---
+    # (current_totals is already calculated based on selected year and filters before the tabs)
     cost_data = {
         'Category': ['Base Salary', 'Premiums', 'Bonuses', 'Social Contributions', 'LTIPs'],
         'Amount': [
@@ -427,47 +485,94 @@ with tab1:
     }
     cost_df = pd.DataFrame(cost_data)
 
-    # Calculate percentages
-    total = cost_df['Amount'].sum()
-    cost_df['Percentage'] = (cost_df['Amount'] / total * 100).round(1)
+    # Calculate total for percentages and center annotation
+    total_cost_for_breakdown = cost_df['Amount'].sum()
 
-    # Create the chart
-    fig = px.pie(
-        cost_df,
-        values='Amount',
-        names='Category',
-        title=f'Cost Distribution for {selected_year}',
-        color_discrete_sequence=px.colors.sequential.Blues_r,
-        hover_data=['Percentage']
-    )
-    fig.update_traces(textposition='inside', textinfo='percent+label')
-    fig.update_layout(
-        height=500,
-        margin=dict(t=50, b=0, l=0, r=0)
-    )
+    # Calculate percentages (handle division by zero if total is zero)
+    if total_cost_for_breakdown > 0:
+        cost_df['Percentage'] = (cost_df['Amount'] / total_cost_for_breakdown * 100)
+    else:
+        cost_df['Percentage'] = 0.0
 
-    st.plotly_chart(fig, use_container_width=True)
+    # Sort by Amount descending for better visual hierarchy in chart/table (optional)
+    cost_df = cost_df.sort_values(by='Amount', ascending=False).reset_index(drop=True)
 
-    # Display cost breakdown in a table with $ and % columns
-    cost_df['Amount'] = cost_df['Amount'].apply(format_currency)
-    cost_df['Percentage'] = cost_df['Percentage'].apply(lambda x: f"{x}%")
+    # --- Create Layout: Chart and Table Side-by-Side ---
+    col1, col2 = st.columns([0.6, 0.4]) # Adjust ratios as needed (60% chart, 40% table)
 
-    st.markdown('<div class="sub-header">Cost Breakdown Details</div>', unsafe_allow_html=True)
-    st.table(cost_df)
+    with col1:
+        # --- Create Donut Chart ---
+        fig = go.Figure(data=[go.Pie(
+            labels=cost_df['Category'],
+            values=cost_df['Amount'],
+            hole=.4,  # Creates the donut hole
+            pull=[0.05 if i == 0 else 0 for i in cost_df.index], # Slightly pull out the largest slice
+            marker_colors=px.colors.sequential.Blues_r, # Use a sequential color scheme
+            hoverinfo='label+percent', # Show label and percentage on hover
+            textinfo='percent',       # Show percentage on slices
+            texttemplate='%{percent:.1%}', # Format text on slices
+            hovertemplate="<b>%{label}</b><br>Amount: %{value:$,.2f}<br>Percentage: %{percent:.1%}<extra></extra>" # Custom hover text
+        )])
 
-    # Add special section for 2025 with new hire cost
+        # Add center annotation for Total Cost
+        fig.add_annotation(
+            text=f"Total:<br>{format_currency(total_cost_for_breakdown)}", # Use helper function
+            x=0.5, y=0.5, # Center position
+            font_size=16, # Adjust font size
+            showarrow=False,
+            font_color="#1E3A8A" # Match header color
+        )
+
+        fig.update_layout(
+            title=f'Cost Distribution for {selected_year}',
+            legend_title_text='Categories',
+            # Adjust margins if needed
+            margin=dict(t=50, b=0, l=0, r=0),
+            height=450 # Adjust height as needed
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    with col2:
+        # --- Create Styled Dataframe with Data Bars ---
+        st.markdown("##### Breakdown Details") # Use markdown for a smaller header
+
+        # Apply styling: format currency, format percentage, add data bars
+        styled_cost_df = cost_df.style \
+            .format({
+                'Amount': format_currency, # Use your existing helper
+                'Percentage': "{:.1f}%"   # Format percentage with one decimal
+            }) \
+            .bar(subset=['Percentage'], color='#93C5FD', vmin=0, vmax=100) # Add data bars
+
+        # Display the styled dataframe
+        st.dataframe(styled_cost_df, use_container_width=True, hide_index=True) # hide_index is cleaner
+
+    # --- Conditional Section for 2025 New Hire Impact ---
+    # (Keep this section as it was, potentially place it below the columns)
     if selected_year == "2025 (Projected)" and num_new_hires > 0:
-        st.markdown('<div class="highlight">', unsafe_allow_html=True)
-        st.markdown(f"### New Hire Impact")
-        st.markdown(f"**Number of New Hires:** {num_new_hires} ({selected_hire_dept}, {selected_band})")
+        # Add a separator
+        st.markdown("---")
+        st.markdown('<div class="highlight">', unsafe_allow_html=True) # Use existing highlight style
+        st.markdown(f"#### New Hire Impact Analysis ({num_new_hires} Hires)") # More descriptive header
 
-        if 'hiring_costs' in projected_totals:
-            st.markdown(f"**Total Hiring Costs:** {format_currency(projected_totals['hiring_costs'])}")
-            st.markdown(f"**Cost per New Hire:** {format_currency(projected_totals['hiring_costs'] / num_new_hires)}")
+        # Display details about the new hires
+        st.markdown(f"**Department:** {selected_hire_dept}, **Band:** {selected_band}")
+
+        # Display calculated hiring costs if available in projected_totals
+        if 'hiring_costs' in projected_totals and projected_totals['hiring_costs'] > 0:
+            st.metric(label="Estimated Total Hiring Costs", value=format_currency(projected_totals['hiring_costs']))
+            # Calculate and display cost per new hire
+            cost_per_hire = projected_totals['hiring_costs'] / num_new_hires
+            st.metric(label="Estimated Cost per Hire", value=format_currency(cost_per_hire))
+        else:
+            st.info("Hiring cost data not available or calculated as zero.")
+
+        # You could add a small table here showing the *additional* cost breakdown
+        # similar to the one in the "Advanced 2025 Projection Section" if desired.
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-# Tab 2: Year-over-Year Comparison
 # Tab 2: Year-over-Year Comparison
 with tab2:
     # Add the sub-header for this tab
