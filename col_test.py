@@ -470,34 +470,69 @@ with tab1:
 # Tab 2: Year-over-Year Comparison
 # Tab 2: Year-over-Year Comparison
 with tab2:
+    # Add the sub-header for this tab
     st.markdown('<div class="sub-header">Year-over-Year Comparison</div>', unsafe_allow_html=True)
 
-    # --- Helper Functions (Keep as they were) ---
+    # --- Helper Functions Defined within Tab 2 Scope ---
+
+    # Helper function for safe division (to handle potential zero denominators)
     def safe_division(numerator, denominator):
         """Performs division, returning 'inf' or 0.0 if denominator is zero."""
+        # Check if denominator is zero
         if denominator == 0:
+            # If numerator is also 0, result is 0. Otherwise, infinite growth.
             return 0.0 if numerator == 0 else float('inf')
+        # Calculate percentage growth: (new - old) / old * 100
         return (numerator - denominator) / denominator * 100
 
-    def format_growth_with_arrow(rate):
-        """Formats growth rate percentage with a leading arrow symbol for the table."""
-        if rate == float('inf'):
-            return "N/A (from zero)"
-        elif rate > 0:
-            return f"▲ {rate:.1f}%"
-        elif rate < 0:
-            return f"▼ {abs(rate):.1f}%"
-        else: # rate == 0
-            return f"▬ {rate:.1f}%"
+    # Helper function to determine the text color for styling the dataframe
+    def color_growth(val):
+        """Returns CSS style string for text color based on value."""
+        # Check for NaN or infinite values
+        if pd.isna(val) or val == float('inf'):
+            color = 'grey' # Neutral color for N/A or infinite growth
+        elif val > 0:
+            color = 'green' # Green for positive growth
+        elif val < 0:
+            color = 'red'   # Red for negative growth
+        else: # val == 0
+            color = 'grey'  # Neutral color for zero growth (or 'black')
+        # Return the CSS style string
+        return f'color: {color}'
 
-    # --- Data Preparation (Keep as it was) ---
+    # Helper function to format the growth number into the desired display string for the dataframe
+    def format_growth_display(val):
+        """Formats number into string with arrow and percentage."""
+        # Handle NaN values
+        if pd.isna(val):
+            return "N/A"
+        # Handle infinite growth (from zero base)
+        if val == float('inf'):
+            return "N/A (from zero)"
+        # Format positive growth
+        elif val > 0:
+            return f"▲ {val:.1f}%" # Up arrow, value, % sign
+        # Format negative growth
+        elif val < 0:
+            # Down arrow, absolute value (to avoid double negative), % sign
+            return f"▼ {abs(val):.1f}%"
+        # Format zero growth
+        else: # val == 0
+            return f"▬ {val:.1f}%" # Neutral symbol, value, % sign
+
+    # --- Data Preparation ---
+
+    # Select the correct data source based on the department filter in the sidebar
     if selected_dept != "All Departments":
+        # Use totals calculated for the specific selected department
         compare_2023 = dept_totals_2023
         compare_2024 = dept_totals_2024
     else:
+        # Use the overall totals calculated from the full dataset
         compare_2023 = totals_2023
         compare_2024 = totals_2024
 
+    # Calculate 2023-2024 growth rates for each category using the safe_division helper
     growth_base = safe_division(compare_2024['total_base_salary'], compare_2023['total_base_salary'])
     growth_premiums = safe_division(compare_2024['total_premiums'], compare_2023['total_premiums'])
     growth_bonuses = safe_division(compare_2024['total_bonuses'], compare_2023['total_bonuses'])
@@ -505,6 +540,7 @@ with tab2:
     growth_ltips = safe_division(compare_2024['total_ltips'], compare_2023['total_ltips'])
     growth_total = safe_division(compare_2024['total_cost'], compare_2023['total_cost'])
 
+    # Round valid growth rates to one decimal place (infinite values remain infinite)
     growth_base = round(growth_base, 1) if growth_base != float('inf') else float('inf')
     growth_premiums = round(growth_premiums, 1) if growth_premiums != float('inf') else float('inf')
     growth_bonuses = round(growth_bonuses, 1) if growth_bonuses != float('inf') else float('inf')
@@ -512,6 +548,7 @@ with tab2:
     growth_ltips = round(growth_ltips, 1) if growth_ltips != float('inf') else float('inf')
     growth_total = round(growth_total, 1) if growth_total != float('inf') else float('inf')
 
+    # Prepare lists of categories and values for the chart and table
     categories = ['Base Salary', 'Premiums', 'Bonuses', 'Social Contributions', 'LTIPs', 'Total Cost']
     year_2023_values = [
         compare_2023['total_base_salary'], compare_2023['total_premiums'], compare_2023['total_bonuses'],
@@ -521,15 +558,16 @@ with tab2:
         compare_2024['total_base_salary'], compare_2024['total_premiums'], compare_2024['total_bonuses'],
         compare_2024['total_social_contributions'], compare_2024['total_ltips'], compare_2024['total_cost']
     ]
+    # List of calculated (and rounded) growth rates
     growth_rates = [
         growth_base, growth_premiums, growth_bonuses,
         growth_social, growth_ltips, growth_total
     ]
 
-    # --- MODIFIED: Chart Creation with Outlines and Text Annotations ---
+    # --- Chart Creation with Outlines and Text Annotations ---
     fig = go.Figure()
 
-    # Add 2023 bars (no changes here)
+    # Add 2023 bars
     fig.add_trace(go.Bar(
         x=categories,
         y=year_2023_values,
@@ -537,115 +575,147 @@ with tab2:
         marker_color='#93C5FD' # Light Blue
     ))
 
-    # --- Prepare outlines and annotations for 2024 bars ---
-    bar_outline_colors = []
-    bar_outline_widths = []
-    annotation_texts = []
-    annotation_colors = []
+    # Prepare lists for conditional styling of 2024 bars and annotations
+    bar_outline_colors = [] # List to hold outline color for each 2024 bar
+    bar_outline_widths = [] # List to hold outline width for each 2024 bar
+    annotation_texts = []   # List to hold the text for annotations (e.g., "+2.3%")
+    annotation_colors = []  # List to hold the color for annotation text
 
+    # Loop through the 2023-2024 growth rates to determine styling for each category
     for growth in growth_rates:
         if growth > 0 and growth != float('inf'):
+            # Positive growth styling
             bar_outline_colors.append('green')
-            bar_outline_widths.append(2) # Outline width for increase
-            annotation_texts.append(f"+{growth:.1f}%")
+            bar_outline_widths.append(2) # Set outline width
+            annotation_texts.append(f"+{growth:.1f}%") # Add '+' sign for clarity
             annotation_colors.append('green')
         elif growth < 0:
+            # Negative growth styling
             bar_outline_colors.append('red')
-            bar_outline_widths.append(2) # Outline width for decrease
-            annotation_texts.append(f"{growth:.1f}%") # Negative sign included
+            bar_outline_widths.append(2) # Set outline width
+            annotation_texts.append(f"{growth:.1f}%") # Negative sign is inherent
             annotation_colors.append('red')
-        else: # Zero or infinite growth
-            bar_outline_colors.append('#2563EB') # Use bar color or a neutral grey
+        else:
+            # Zero or infinite growth styling (neutral)
+            bar_outline_colors.append('#2563EB') # Use the bar's fill color (or grey)
             bar_outline_widths.append(0) # No distinct outline
-            annotation_texts.append(" ") # No text or maybe "0.0%" or "N/A"
+            annotation_texts.append(" ") # Empty text for no annotation
             annotation_colors.append('grey') # Neutral color
 
-    # Add 2024 bars with conditional outlines
+    # Add 2024 bars with the prepared conditional outlines
     fig.add_trace(go.Bar(
         x=categories,
         y=year_2024_values,
         name='2024',
-        marker_color='#2563EB', # Medium Blue fill
-        marker_line_color=bar_outline_colors, # Apply list of outline colors
-        marker_line_width=bar_outline_widths  # Apply list of outline widths
+        marker_color='#2563EB', # Medium Blue fill color
+        marker_line_color=bar_outline_colors, # Apply the list of outline colors
+        marker_line_width=bar_outline_widths  # Apply the list of outline widths
     ))
 
-    # Add 2025 projected bars if that year is selected (keep as before)
+    # Add 2025 projected bars if that year is selected in the sidebar
     if selected_year == "2025 (Projected)":
+        # 'current_totals' holds the correctly calculated/filtered projected data
         proj_data_source = current_totals
+        # Get the projected values for the chart
         year_2025_values_chart = [
             proj_data_source['total_base_salary'], proj_data_source['total_premiums'], proj_data_source['total_bonuses'],
             proj_data_source['total_social_contributions'], proj_data_source['total_ltips'], proj_data_source['total_cost']
         ]
+        # Add the 2025 bar trace
         fig.add_trace(go.Bar(
             x=categories,
             y=year_2025_values_chart,
             name='2025 (Projected)',
             marker_color='#1E3A8A' # Dark Blue
-            # No outline needed for projected bars unless comparing 24 vs 25
+            # No special outline needed unless comparing 2024 vs 2025
         ))
 
-    # Add text annotations for percentage change above 2024 bars
+    # Add text annotations (percentage change) above the 2024 bars
     for i, category in enumerate(categories):
-        val_2024 = year_2024_values[i]
-        text = annotation_texts[i]
-        color = annotation_colors[i]
+        val_2024 = year_2024_values[i] # Y position based on 2024 bar height
+        text = annotation_texts[i]     # Get the prepared text (e.g., "+2.3%")
+        color = annotation_colors[i]   # Get the prepared color (green/red/grey)
 
-        if text.strip(): # Only add annotation if text is not blank
+        # Only add an annotation if the text is not blank
+        if text.strip():
             fig.add_annotation(
-                x=category,
-                y=val_2024,
-                text=text, # The formatted percentage string (+x.x% or -x.x%)
-                showarrow=False,
+                x=category, # X position based on category
+                y=val_2024, # Y position based on bar height
+                text=text,  # The formatted percentage string
+                showarrow=False, # Don't show the default annotation arrow
                 font=dict(
-                    color=color,
-                    size=11 # Adjust size as needed
+                    color=color, # Apply the determined color
+                    size=11      # Adjust font size if needed
                 ),
-                yshift=15 # Shift slightly higher to clear the bar outline
+                yshift=15 # Shift text vertically above the bar (adjust as needed)
             )
 
-    # Configure chart layout (ensure sufficient top margin)
+    # Configure the overall chart layout
     fig.update_layout(
-        title="Cost Comparison (Outline/Text shows 2023-2024 change)", # Updated title
+        title="Cost Comparison (Outline/Text shows 2023-2024 change)", # Informative title
         xaxis_title="Cost Category",
         yaxis_title="Amount ($)",
         legend_title="Year",
-        barmode='group',
-        height=550,
-        margin=dict(t=90, b=40, l=40, r=40) # Increased top margin further for text
+        barmode='group', # Group bars by category
+        height=550,      # Set chart height
+        margin=dict(t=90, b=40, l=40, r=40) # Adjust top margin for annotations
     )
 
-    # Format Y-axis as currency
+    # Format the Y-axis ticks as currency ($)
     fig.update_yaxes(tickprefix="$", tickformat=",")
 
-    # Display the chart in Streamlit
+    # Display the Plotly chart in the Streamlit app
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Display Growth Rates Table (Keep as it was, uses format_growth_with_arrow) ---
-    growth_data = {
+    # --- Display Growth Rates Table using st.dataframe with Styling ---
+
+    # Create the dictionary for the DataFrame - STORE RAW NUMBERS for styling
+    growth_data_raw = {
         'Category': categories,
-        '2023 Amount': [format_currency(val) for val in year_2023_values],
-        '2024 Amount': [format_currency(val) for val in year_2024_values],
-        '2023-2024 Growth': [format_growth_with_arrow(rate) for rate in growth_rates]
+        '2023 Amount': year_2023_values, # Store raw numbers
+        '2024 Amount': year_2024_values, # Store raw numbers
+        '2023-2024 Growth': growth_rates # Store raw numerical growth rates
     }
+
+    # Add 2025 columns to the raw data dictionary if applicable
     if selected_year == "2025 (Projected)":
+        # Use the same projection data source as the chart
         proj_data_source = current_totals
+        # Get raw values for the table
         year_2025_values_table = [
             proj_data_source['total_base_salary'], proj_data_source['total_premiums'], proj_data_source['total_bonuses'],
             proj_data_source['total_social_contributions'], proj_data_source['total_ltips'], proj_data_source['total_cost']
         ]
+        # Calculate 2024-2025 growth rates using the correct projected data
         keys_for_growth = ['total_base_salary', 'total_premiums', 'total_bonuses',
                            'total_social_contributions', 'total_ltips', 'total_cost']
         growth_2025 = []
         for key in keys_for_growth:
+            # Use compare_2024 as the base for 2024->2025 growth calculation
             rate_2025 = safe_division(proj_data_source[key], compare_2024[key])
             growth_2025.append(round(rate_2025, 1) if rate_2025 != float('inf') else float('inf'))
 
-        growth_data['2025 Amount (Projected)'] = [format_currency(val) for val in year_2025_values_table]
-        growth_data['2024-2025 Growth (Projected)'] = [format_growth_with_arrow(rate) for rate in growth_2025]
+        # Add raw 2025 data and growth to the dictionary
+        growth_data_raw['2025 Amount (Projected)'] = year_2025_values_table
+        growth_data_raw['2024-2025 Growth (Projected)'] = growth_2025
 
-    growth_df = pd.DataFrame(growth_data)
-    st.table(growth_df) # Table still shows ▲/▼ for consistency there
+    # Create the Pandas DataFrame from the raw data dictionary
+    growth_df_raw = pd.DataFrame(growth_data_raw)
+
+    # Define columns to apply specific styling/formatting
+    amount_cols = [col for col in growth_df_raw.columns if 'Amount' in col]
+    growth_cols = [col for col in growth_df_raw.columns if 'Growth' in col]
+
+    # Apply styling and formatting using Pandas Styler
+    styled_df = growth_df_raw.style \
+        .format(format_currency, subset=amount_cols) \
+        .format(format_growth_display, subset=growth_cols) \
+        .apply(lambda x: x.map(color_growth), subset=growth_cols) # Apply color based on original value using apply/map
+
+
+    # Display the styled DataFrame in Streamlit
+    # use_container_width=True makes the table expand to the column width
+    st.dataframe(styled_df, use_container_width=True)
 
 # --- End of Tab 2 ---
     
