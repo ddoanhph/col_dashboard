@@ -471,7 +471,36 @@ with tab1:
 with tab2:
     st.markdown('<div class="sub-header">Year-over-Year Comparison</div>', unsafe_allow_html=True)
 
-    # --- Data Preparation (Keep this part as it is) ---
+    # --- Helper Functions ---
+
+    # Helper function for safe division (to handle potential zero denominators)
+    def safe_division(numerator, denominator):
+        """Performs division, returning 'inf' or 0.0 if denominator is zero."""
+        if denominator == 0:
+            # If numerator is also 0, result is 0. Otherwise, infinite growth.
+            return 0.0 if numerator == 0 else float('inf')
+        # Calculate percentage growth: (new - old) / old * 100
+        return (numerator - denominator) / denominator * 100
+
+    # Helper function to format growth rate with an inline arrow for the table
+    def format_growth_with_arrow(rate):
+        """Formats growth rate percentage with a leading arrow symbol."""
+        if rate == float('inf'):
+            # Handle growth from a zero base where percentage is infinite
+            return "N/A (from zero)"
+        elif rate > 0:
+            # Positive growth: Green Up Arrow
+            return f"▲ {rate:.1f}%"
+        elif rate < 0:
+            # Negative growth: Red Down Arrow (use abs() for positive number display)
+            return f"▼ {abs(rate):.1f}%"
+        else: # rate == 0
+            # Zero growth: Neutral symbol
+            return f"▬ {rate:.1f}%"
+
+    # --- Data Preparation ---
+
+    # Select the correct data based on the department filter
     if selected_dept != "All Departments":
         compare_2023 = dept_totals_2023
         compare_2024 = dept_totals_2024
@@ -479,13 +508,7 @@ with tab2:
         compare_2023 = totals_2023
         compare_2024 = totals_2024
 
-    # Calculate growth rates (Keep this part as it is)
-    # Handle potential division by zero for safety
-    def safe_division(numerator, denominator):
-        if denominator == 0:
-            return float('inf') if numerator > 0 else 0.0
-        return (numerator - denominator) / denominator * 100
-
+    # Calculate 2023-2024 growth rates using safe division
     growth_base = safe_division(compare_2024['total_base_salary'], compare_2023['total_base_salary'])
     growth_premiums = safe_division(compare_2024['total_premiums'], compare_2023['total_premiums'])
     growth_bonuses = safe_division(compare_2024['total_bonuses'], compare_2023['total_bonuses'])
@@ -493,6 +516,7 @@ with tab2:
     growth_ltips = safe_division(compare_2024['total_ltips'], compare_2023['total_ltips'])
     growth_total = safe_division(compare_2024['total_cost'], compare_2023['total_cost'])
 
+    # Round valid growth rates (infinite values remain infinite)
     growth_base = round(growth_base, 1) if growth_base != float('inf') else float('inf')
     growth_premiums = round(growth_premiums, 1) if growth_premiums != float('inf') else float('inf')
     growth_bonuses = round(growth_bonuses, 1) if growth_bonuses != float('inf') else float('inf')
@@ -500,8 +524,7 @@ with tab2:
     growth_ltips = round(growth_ltips, 1) if growth_ltips != float('inf') else float('inf')
     growth_total = round(growth_total, 1) if growth_total != float('inf') else float('inf')
 
-
-    # Create comparison chart data (Keep this part as it is)
+    # Prepare data lists for the chart and table
     categories = ['Base Salary', 'Premiums', 'Bonuses', 'Social Contributions', 'LTIPs', 'Total Cost']
     year_2023_values = [
         compare_2023['total_base_salary'], compare_2023['total_premiums'], compare_2023['total_bonuses'],
@@ -516,9 +539,10 @@ with tab2:
         growth_social, growth_ltips, growth_total
     ]
 
-    # --- Chart Creation and Annotation (MODIFIED PART) ---
+    # --- Chart Creation and Annotation ---
     fig = go.Figure()
 
+    # Add 2023 bars
     fig.add_trace(go.Bar(
         x=categories,
         y=year_2023_values,
@@ -526,6 +550,7 @@ with tab2:
         marker_color='#93C5FD' # Light Blue
     ))
 
+    # Add 2024 bars
     fig.add_trace(go.Bar(
         x=categories,
         y=year_2024_values,
@@ -533,32 +558,33 @@ with tab2:
         marker_color='#2563EB' # Medium Blue
     ))
 
-    # Add 2025 projections if selected (Keep this part as it is)
+    # Add 2025 projected bars if that year is selected
     if selected_year == "2025 (Projected)":
-        # Use projected_totals for the department if filtered, otherwise use overall projected_totals
-        proj_data_source = current_totals if selected_dept != "All Departments" else projected_totals
-        year_2025_values = [
+        # Determine the correct source for 2025 projection data based on dept filter
+        # 'current_totals' already holds the correctly filtered/calculated 2025 data
+        proj_data_source = current_totals
+        year_2025_values_chart = [
             proj_data_source['total_base_salary'], proj_data_source['total_premiums'], proj_data_source['total_bonuses'],
             proj_data_source['total_social_contributions'], proj_data_source['total_ltips'], proj_data_source['total_cost']
         ]
         fig.add_trace(go.Bar(
             x=categories,
-            y=year_2025_values,
+            y=year_2025_values_chart,
             name='2025 (Projected)',
             marker_color='#1E3A8A' # Dark Blue
         ))
 
-    # *** NEW: Add annotations for growth indicators (arrows) ***
+    # Add annotations (bolder arrows) for 2023-2024 growth indicators on the chart
     for i, category in enumerate(categories):
         val_2024 = year_2024_values[i]
-        growth = growth_rates[i]
+        growth = growth_rates[i] # Use the calculated 2023-2024 growth rate
 
         # Determine arrow symbol and color based on 2023-2024 growth
-        if growth > 0 and growth != float('inf') :
-            arrow_symbol = "▲" # Upwards arrow
+        if growth > 0 and growth != float('inf'):
+            arrow_symbol = "⬆" # Heavier arrow up
             arrow_color = "green"
         elif growth < 0:
-            arrow_symbol = "▼" # Downwards arrow
+            arrow_symbol = "⬇" # Heavier arrow down
             arrow_color = "red"
         else: # Includes 0 and infinite growth (from zero base)
             arrow_symbol = "" # No arrow
@@ -571,58 +597,67 @@ with tab2:
                 showarrow=False, # We only want the symbol, not an arrow line
                 font=dict(
                     color=arrow_color,
-                    size=14  # Adjust size as needed
+                    size=16  # Slightly larger size for bolder arrows
                 ),
                 yshift=10  # Shift the arrow slightly *above* the bar top
             )
-    # *** END NEW ANNOTATION PART ***
 
+    # Configure chart layout
     fig.update_layout(
-        # Update title to explain arrows
-        title="Cost Comparison (Arrows indicate 2023-2024 change)",
+        title="Cost Comparison (Arrows indicate 2023-2024 change)", # Updated title
         xaxis_title="Cost Category",
         yaxis_title="Amount ($)",
         legend_title="Year",
         barmode='group',
-        height=550, # Increased height slightly for better spacing
-        margin=dict(t=80, b=40, l=40, r=40) # **Increased top margin** for arrows
+        height=550, # Slightly increased height
+        margin=dict(t=80, b=40, l=40, r=40) # Increased top margin for arrows
     )
 
-    # Add dollar sign formatting to y-axis (Keep this part as it is)
+    # Format Y-axis as currency
     fig.update_yaxes(tickprefix="$", tickformat=",")
 
+    # Display the chart in Streamlit
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Display growth rates table (Keep this part as it is, but ensure calculation above is correct) ---
+    # --- Display Growth Rates Table with Inline Arrows ---
+
+    # Create the dictionary for the DataFrame, using the formatting function
     growth_data = {
         'Category': categories,
         '2023 Amount': [format_currency(val) for val in year_2023_values],
         '2024 Amount': [format_currency(val) for val in year_2024_values],
-        '2023-2024 Growth': [f"{rate}%" if rate != float('inf') else "N/A (from zero)" for rate in growth_rates]
+        '2023-2024 Growth': [format_growth_with_arrow(rate) for rate in growth_rates]
     }
 
+    # Add 2025 columns to the table data if applicable
     if selected_year == "2025 (Projected)":
-        # Use projected_totals for the department if filtered, otherwise use overall projected_totals
-        proj_data_source = current_totals if selected_dept != "All Departments" else projected_totals
+        # Use the same projection data source as the chart
+        proj_data_source = current_totals
         year_2025_values_table = [
             proj_data_source['total_base_salary'], proj_data_source['total_premiums'], proj_data_source['total_bonuses'],
             proj_data_source['total_social_contributions'], proj_data_source['total_ltips'], proj_data_source['total_cost']
         ]
 
+        # Calculate 2024-2025 growth rates using the correct projected data
         keys_for_growth = ['total_base_salary', 'total_premiums', 'total_bonuses',
                            'total_social_contributions', 'total_ltips', 'total_cost']
         growth_2025 = []
         for key in keys_for_growth:
+            # Use compare_2024 as the base for 2024->2025 growth
             rate_2025 = safe_division(proj_data_source[key], compare_2024[key])
             growth_2025.append(round(rate_2025, 1) if rate_2025 != float('inf') else float('inf'))
 
-
+        # Add formatted 2025 data and growth to the dictionary
         growth_data['2025 Amount (Projected)'] = [format_currency(val) for val in year_2025_values_table]
-        growth_data['2024-2025 Growth (Projected)'] = [f"{rate:.1f}%" if rate != float('inf') else "N/A (from zero)" for rate in growth_2025]
+        growth_data['2024-2025 Growth (Projected)'] = [format_growth_with_arrow(rate) for rate in growth_2025]
 
-
+    # Create the DataFrame from the dictionary
     growth_df = pd.DataFrame(growth_data)
+
+    # Display the table using st.table
     st.table(growth_df)
+
+# --- End of Tab 2 ---
     
 # Tab 3: Detailed Analysis
 with tab3:
