@@ -468,8 +468,9 @@ tab1, tab2, tab3 = st.tabs(["📊 Cost Breakdown", "📈 Year-over-Year", "🔍 
 #         st.markdown('</div>', unsafe_allow_html=True)
 
 # Tab 1: Cost Breakdown
+# Tab 1: Cost Breakdown
 with tab1:
-    st.markdown('<div class="sub-header">Cost Breakdown Analysis</div>', unsafe_allow_html=True) # Slightly updated title
+    st.markdown('<div class="sub-header">Cost Breakdown Analysis</div>', unsafe_allow_html=True)
 
     # --- Data Preparation for the Chart and Table ---
     # (current_totals is already calculated based on selected year and filters before the tabs)
@@ -494,65 +495,61 @@ with tab1:
     else:
         cost_df['Percentage'] = 0.0
 
-    # Sort by Amount descending for better visual hierarchy in chart/table (optional)
+    # Sort by Amount descending for better visual hierarchy (optional but recommended)
     cost_df = cost_df.sort_values(by='Amount', ascending=False).reset_index(drop=True)
 
-    # --- Create Layout: Chart and Table Side-by-Side ---
-    # Use st.columns(2) for equal width columns
-    col1, col2 = st.columns(2) # MODIFIED: Equal column widths
+    # --- Create Donut Chart (Displayed first) ---
+    st.markdown(f"#### Cost Distribution for {selected_year}") # Add a title above the chart
 
-    with col1:
-        # --- Create Donut Chart ---
-        fig = go.Figure(data=[go.Pie(
-            labels=cost_df['Category'],
-            values=cost_df['Amount'],
-            hole=.4,  # Creates the donut hole
-            pull=[0.05 if i == 0 else 0 for i in cost_df.index], # Slightly pull out the largest slice
-            marker_colors=px.colors.sequential.Blues_r, # Use a sequential color scheme
-            hoverinfo='label+percent', # Show label and percentage on hover
-            textinfo='percent',       # Show percentage on slices
-            texttemplate='%{percent:.1%}', # Format text on slices
-            insidetextorientation='radial', # Improve text readability on smaller slices
-            hovertemplate="<b>%{label}</b><br>Amount: %{value:$,.2f}<br>Percentage: %{percent:.1%}<extra></extra>" # Custom hover text
-        )])
+    fig = go.Figure(data=[go.Pie(
+        labels=cost_df['Category'],
+        values=cost_df['Amount'],
+        hole=.4,  # Creates the donut hole
+        pull=[0.05 if i == 0 else 0 for i in cost_df.index], # Slightly pull out the largest slice
+        marker_colors=px.colors.sequential.Blues_r, # Use a sequential color scheme
+        # MODIFIED: Show label and percentage on slices
+        textinfo='label+percent',
+        # texttemplate='%{label}<br>%{percent:.1%}', # Optional: Custom template if needed
+        insidetextorientation='auto', # Let Plotly decide best text orientation
+        hovertemplate="<b>%{label}</b><br>Amount: %{value:$,.2f}<br>Percentage: %{percent:.1%}<extra></extra>" # Custom hover text
+    )])
 
-        # Add center annotation for Total Cost
-        fig.add_annotation(
-            text=f"Total:<br>{format_currency(total_cost_for_breakdown)}", # Use helper function
-            x=0.5, y=0.5, # Center position
-            font_size=18, # MODIFIED: Slightly larger font for total
-            showarrow=False,
-            font_color="#1E3A8A" # Match header color
-        )
+    # Add center annotation for Total Cost
+    fig.add_annotation(
+        text=f"Total:<br>{format_currency(total_cost_for_breakdown)}", # Use helper function
+        x=0.5, y=0.5, # Center position
+        font_size=18,
+        showarrow=False,
+        font_color="#1E3A8A" # Match header color
+    )
 
-        fig.update_layout(
-            title=f'Cost Distribution for {selected_year}',
-            # legend_title_text='Categories', # No longer needed
-            showlegend=False, # MODIFIED: Hide the legend
-            margin=dict(t=50, b=20, l=20, r=20), # Adjust margins for better spacing
-            height=500 # MODIFIED: Increased height
-        )
+    fig.update_layout(
+        # title=f'Cost Distribution for {selected_year}', # Title moved outside chart
+        legend_title_text='Categories', # Add title to legend
+        showlegend=True, # MODIFIED: Ensure legend is shown
+        margin=dict(t=20, b=20, l=20, r=20), # Adjust margins
+        height=500 # Adjust height as needed for chart + legend
+    )
 
-        st.plotly_chart(fig, use_container_width=True)
+    # Display the chart, taking full container width
+    st.plotly_chart(fig, use_container_width=True)
 
-    with col2:
-        # --- Create Styled Dataframe with Data Bars ---
-        st.markdown("##### Breakdown Details") # Use markdown for a smaller header
+    # --- Create Styled Dataframe with Data Bars (Displayed below chart) ---
+    st.markdown("#### Breakdown Details") # Add a title above the table
 
-        # Apply styling: format currency, format percentage, add data bars
-        styled_cost_df = cost_df.style \
-            .format({
-                'Amount': format_currency, # Use your existing helper
-                'Percentage': "{:.1f}%"   # Format percentage with one decimal
-            }) \
-            .bar(subset=['Percentage'], color='#93C5FD', vmin=0, vmax=100, align='left') # Add data bars aligned left
+    # Apply styling: format currency, format percentage, add data bars
+    styled_cost_df = cost_df.style \
+        .format({
+            'Amount': format_currency, # Use your existing helper
+            'Percentage': "{:.1f}%"   # Format percentage with one decimal
+        }) \
+        .bar(subset=['Percentage'], color='#93C5FD', vmin=0, vmax=100, align='left') # Add data bars aligned left
 
-        # Display the styled dataframe
-        # Set height potentially? Streamlit dataframe height is tricky.
-        st.dataframe(styled_cost_df, use_container_width=True, hide_index=True) # hide_index is cleaner
+    # Display the styled dataframe
+    st.dataframe(styled_cost_df, use_container_width=True, hide_index=True)
 
     # --- Conditional Section for 2025 New Hire Impact ---
-    # (Keep this section as it was, placed below the columns)
+    # (Placed at the end of the tab)
     if selected_year == "2025 (Projected)" and num_new_hires > 0:
         # Add a separator
         st.markdown("---")
@@ -570,9 +567,6 @@ with tab1:
             st.metric(label="Estimated Cost per Hire", value=format_currency(cost_per_hire))
         else:
             st.info("Hiring cost data not available or calculated as zero.")
-
-        # You could add a small table here showing the *additional* cost breakdown
-        # similar to the one in the "Advanced 2025 Projection Section" if desired.
 
         st.markdown('</div>', unsafe_allow_html=True)
 
