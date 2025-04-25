@@ -1059,7 +1059,7 @@ with tab3:
         analysis_totals = current_totals
 
     # Create two sub-tabs for different analysis views
-    subtab1, subtab2, subtab3 = st.tabs(["Department Analysis", "Band Distribution"])
+    subtab1, subtab2 = st.tabs(["Department Analysis", "Band Distribution"])
 
     # Department Analysis
     with subtab1:
