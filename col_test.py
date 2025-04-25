@@ -132,11 +132,9 @@ st.markdown("""
     }
 
     .main-header {
-        font-family: 'Poppins', sans-serif; /* MODIFIED: Use Poppins font */
-        font-size: 3.0rem; /* Keep increased font size */
-        font-weight: 700; /* Bold */
+        font-size: 2.5rem;
+        font-weight: 700;
         color: #1E3A8A; /* Dark Blue */
-        text-align: center; /* Keep centered */
         margin-bottom: 0.5rem;
     }
     /* Style for the description text below titles */
