@@ -467,7 +467,7 @@ tab1, tab2, tab3 = st.tabs(["📊 Cost Breakdown", "📈 Year-over-Year", "🔍 
 
 #         st.markdown('</div>', unsafe_allow_html=True)
 
-Tab 1: Cost Breakdown
+#Tab 1: Cost Breakdown
 with tab1:
     st.markdown('<div class="sub-header">Cost Breakdown Analysis</div>', unsafe_allow_html=True)
 
