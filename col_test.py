@@ -1042,8 +1042,8 @@ with tab2:
     st.dataframe(styled_df, use_container_width=True)
 
 # --- End of Tab 2 ---
-    
-Tab 3: Detailed Analysis
+
+# Tab 3: Detailed Analysis
 with tab3:
     st.markdown('<div class="sub-header">Detailed Analysis</div>', unsafe_allow_html=True)
 
