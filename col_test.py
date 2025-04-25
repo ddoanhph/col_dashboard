@@ -1043,75 +1043,7 @@ with tab2:
 
 # --- End of Tab 2 ---
     
-# Tab 3: Detailed Analysis
-# with tab3:
-#     st.markdown('<div class="sub-header">Detailed Analysis</div>', unsafe_allow_html=True)
-
-#     # Choose which data to display based on selected year
-#     if selected_year == "2023":
-#         analysis_df = df_2023_filtered
-#         analysis_totals = dept_totals_2023
-#     elif selected_year == "2024":
-#         analysis_df = df_2024_filtered
-#         analysis_totals = dept_totals_2024
-#     else:  # 2025 projection - base on 2024 data
-#         analysis_df = df_2024_filtered
-#         analysis_totals = current_totals
-
-#     # Create two sub-tabs for different analysis views
-#     subtab1, subtab2, subtab3 = st.tabs(["Department Analysis", "Band Distribution", "Hours Analysis"])
-
-#     # Department Analysis
-#     with subtab1:
-#         if selected_dept == "All Departments":
-#             # Show department breakdown
-#             dept_analysis = analysis_df.groupby('department').agg({
-#                 'base_salary': 'sum',
-#                 'employee_id': 'count'
-#             }).reset_index()
-
-#             dept_analysis.columns = ['Department', 'Total Base Salary', 'Employee Count']
-
-#             # Calculate average salary by department
-#             dept_analysis['Average Salary'] = dept_analysis['Total Base Salary'] / dept_analysis['Employee Count']
-
-#             # Format as currency
-#             dept_analysis['Total Base Salary'] = dept_analysis['Total Base Salary'].apply(format_currency)
-#             dept_analysis['Average Salary'] = dept_analysis['Average Salary'].apply(format_currency)
-
-#             # Department distribution chart
-#             fig = px.bar(
-#                 dept_analysis,
-#                 x='Department',
-#                 y='Employee Count',
-#                 title='Employee Distribution by Department',
-#                 color='Department',
-#                 color_discrete_sequence=px.colors.qualitative.Set3
-#             )
-
-#             st.plotly_chart(fig, use_container_width=True)
-
-#             # Department salary breakdown
-#             st.markdown("### Department Salary Breakdown")
-#             st.table(dept_analysis)
-#         else:
-#             st.markdown(f"### {selected_dept} Department Analysis")
-
-#             # Band distribution within department
-#             band_count = analysis_df['band'].value_counts().reset_index()
-#             band_count.columns = ['Band', 'Count']
-
-#             fig = px.pie(
-#                 band_count,
-#                 values='Count',
-#                 names='Band',
-#                 title=f'Band Distribution in {selected_dept}',
-#                 color_discrete_sequence=px.colors.sequential.Blues_r
-#             )
-#             fig.update_traces(textposition='inside', textinfo='percent+label')
-
-#             st.plotly_chart(fig, use_container_width=True)
-
+Tab 3: Detailed Analysis
 with tab3:
     st.markdown('<div class="sub-header">Detailed Analysis</div>', unsafe_allow_html=True)
 
@@ -1124,110 +1056,61 @@ with tab3:
         analysis_totals = dept_totals_2024
     else:  # 2025 projection - base on 2024 data
         analysis_df = df_2024_filtered
-        analysis_totals = current_totals # Use the potentially projected totals
+        analysis_totals = current_totals
 
     # Create two sub-tabs for different analysis views
-    subtab1, subtab2, subtab3 = st.tabs(["Department Analysis", "Band Distribution", "Hours Analysis"])
+    subtab1, subtab2, subtab3 = st.tabs(["Department Analysis", "Band Distribution"])
 
-    # --- Department Analysis ---
+    # Department Analysis
     with subtab1:
-        # Check if 'All Departments' is selected to show the breakdown chart
         if selected_dept == "All Departments":
-            st.markdown("##### Employee Distribution by Department") # Sub-header for the chart
+            # Show department breakdown
+            dept_analysis = analysis_df.groupby('department').agg({
+                'base_salary': 'sum',
+                'employee_id': 'count'
+            }).reset_index()
 
-            # Aggregate data by department
-            dept_analysis = analysis_df.groupby('department').agg(
-                # Sum base salary for potential other uses (like average salary calc)
-                total_base_salary = pd.NamedAgg(column='base_salary', aggfunc='sum'),
-                # Count employees per department
-                employee_count = pd.NamedAgg(column='employee_id', aggfunc='count')
-            ).reset_index()
+            dept_analysis.columns = ['Department', 'Total Base Salary', 'Employee Count']
 
-            # Rename columns for clarity
-            dept_analysis.rename(columns={'department': 'Department',
-                                          'total_base_salary': 'Total Base Salary',
-                                          'employee_count': 'Employee Count'}, inplace=True)
-
-            # --- MODIFIED: Department distribution chart with new color palette ---
-            fig_dept_dist = px.bar(
-                dept_analysis,
-                x='Department',
-                y='Employee Count',
-                # title='Employee Distribution by Department', # Title moved outside chart
-                color='Department', # Color bars by department name
-                # MODIFIED: Changed color sequence
-                color_discrete_sequence=px.colors.qualitative.Plotly,
-                # Add hover data for clarity
-                hover_data={'Department': True, 'Employee Count': True}
-            )
-
-            # Update layout for better readability
-            fig_dept_dist.update_layout(
-                xaxis_title="Department",
-                yaxis_title="Employee Count",
-                legend_title="Department",
-                height=450 # Adjust height if needed
-            )
-            # Ensure y-axis starts at 0
-            fig_dept_dist.update_yaxes(rangemode='tozero')
-
-            # Display the chart
-            st.plotly_chart(fig_dept_dist, use_container_width=True)
-
-            # --- Department salary breakdown table (optional - keep if needed) ---
             # Calculate average salary by department
             dept_analysis['Average Salary'] = dept_analysis['Total Base Salary'] / dept_analysis['Employee Count']
 
-            # Format as currency (make sure format_currency is defined)
-            try:
-                dept_analysis['Total Base Salary'] = dept_analysis['Total Base Salary'].apply(format_currency)
-                dept_analysis['Average Salary'] = dept_analysis['Average Salary'].apply(format_currency)
-            except NameError:
-                 # Fallback formatting if helper function isn't available
-                 dept_analysis['Total Base Salary'] = dept_analysis['Total Base Salary'].apply(lambda x: f"${x:,.0f}")
-                 dept_analysis['Average Salary'] = dept_analysis['Average Salary'].apply(lambda x: f"${x:,.0f}")
+            # Format as currency
+            dept_analysis['Total Base Salary'] = dept_analysis['Total Base Salary'].apply(format_currency)
+            dept_analysis['Average Salary'] = dept_analysis['Average Salary'].apply(format_currency)
 
-
-            st.markdown("##### Department Salary Breakdown") # Sub-header for the table
-            # Use st.dataframe for better default styling than st.table
-            st.dataframe(
-                dept_analysis[['Department', 'Employee Count', 'Total Base Salary', 'Average Salary']],
-                hide_index=True,
-                use_container_width=True
+            # Department distribution chart
+            fig = px.bar(
+                dept_analysis,
+                x='Department',
+                y='Employee Count',
+                title='Employee Distribution by Department',
+                color='Department',
+                color_discrete_sequence=px.colors.qualitative.Set3
             )
 
-        # Handle case where a specific department is selected
-        else:
-            st.markdown(f"##### {selected_dept} Department Analysis")
+            st.plotly_chart(fig, use_container_width=True)
 
-            # Band distribution within the selected department
+            # Department salary breakdown
+            st.markdown("### Department Salary Breakdown")
+            st.table(dept_analysis)
+        else:
+            st.markdown(f"### {selected_dept} Department Analysis")
+
+            # Band distribution within department
             band_count = analysis_df['band'].value_counts().reset_index()
             band_count.columns = ['Band', 'Count']
 
-            fig_band_pie = px.pie(
+            fig = px.pie(
                 band_count,
                 values='Count',
                 names='Band',
                 title=f'Band Distribution in {selected_dept}',
-                # Use a sequential color scheme for the pie chart within a department
                 color_discrete_sequence=px.colors.sequential.Blues_r
             )
-            fig_band_pie.update_traces(textposition='inside', textinfo='percent+label')
-            fig_band_pie.update_layout(height=400) # Adjust height
+            fig.update_traces(textposition='inside', textinfo='percent+label')
 
-            st.plotly_chart(fig_band_pie, use_container_width=True)
-
-            # You could add more specific metrics for the selected department here
-            st.metric(label="Total Employees", value=analysis_df.shape[0])
-            try:
-                avg_sal = analysis_df['base_salary'].mean()
-                st.metric(label="Average Base Salary", value=format_currency(avg_sal))
-            except NameError:
-                avg_sal = analysis_df['base_salary'].mean()
-                st.metric(label="Average Base Salary", value=f"${avg_sal:,.0f}")
-            except Exception:
-                st.info("Could not calculate average salary.")
-
+            st.plotly_chart(fig, use_container_width=True)
 
     # Band Distribution
     with subtab2:
