@@ -513,30 +513,46 @@ tab1, tab2, tab3 = st.tabs(["📊 Cost Breakdown", "📈 Year-over-Year", "🔍 
 
 #         st.markdown('</div>', unsafe_allow_html=True)
 
+# Ensure these imports are at the top of your main script
+import streamlit as st
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
+# import seaborn as sns # No longer needed for this version
+
 # Tab 1: Cost Breakdown
 with tab1:
+    # Add the sub-header for this tab
     st.markdown('<div class="sub-header">Cost Breakdown Analysis</div>', unsafe_allow_html=True)
 
-    # --- Data Preparation for the Chart and Table ---
-    # (current_totals is already calculated based on selected year and filters before the tabs)
+    # --- Data Preparation for the Chart and Metrics ---
+    # Ensure 'current_totals' dictionary is calculated based on selected year/filters before this tab
+    # Example structure of current_totals assumed:
+    # current_totals = {
+    #     'total_base_salary': ..., 'total_premiums': ..., 'total_bonuses': ...,
+    #     'total_social_contributions': ..., 'total_ltips': ..., 'total_cost': ...
+    # }
+
+    # Create DataFrame for easier processing
     cost_data = {
         'Category': ['Base Salary', 'Premiums', 'Bonuses', 'Social Contributions', 'LTIPs'],
         'Amount': [
-            current_totals['total_base_salary'],
-            current_totals['total_premiums'],
-            current_totals['total_bonuses'],
-            current_totals['total_social_contributions'],
-            current_totals['total_ltips']
+            current_totals.get('total_base_salary', 0), # Use .get for safety
+            current_totals.get('total_premiums', 0),
+            current_totals.get('total_bonuses', 0),
+            current_totals.get('total_social_contributions', 0),
+            current_totals.get('total_ltips', 0)
         ]
     }
     cost_df = pd.DataFrame(cost_data)
 
-    # Calculate total for percentages and center annotation
+    # Calculate total cost for percentages and center annotation
+    # Use the sum from the DataFrame to ensure consistency
     total_cost_for_breakdown = cost_df['Amount'].sum()
 
     # Calculate percentages (handle division by zero if total is zero)
     if total_cost_for_breakdown > 0:
-        # Ensure Percentage is float for styling functions
+        # Ensure Percentage is float
         cost_df['Percentage'] = (cost_df['Amount'] / total_cost_for_breakdown * 100).astype(float)
     else:
         cost_df['Percentage'] = 0.0
@@ -544,7 +560,7 @@ with tab1:
     # Ensure Amount is numeric
     cost_df['Amount'] = pd.to_numeric(cost_df['Amount'])
 
-    # Sort by Amount descending for better visual hierarchy (important for highlighting top row)
+    # Sort by Amount descending for better visual hierarchy in metrics display
     cost_df = cost_df.sort_values(by='Amount', ascending=False).reset_index(drop=True)
 
     # --- Create Donut Chart (Displayed first) ---
@@ -554,72 +570,115 @@ with tab1:
         labels=cost_df['Category'],
         values=cost_df['Amount'],
         hole=.4,  # Creates the donut hole
-        pull=[0.05 if i == 0 else 0 for i in cost_df.index], # Slightly pull out the largest slice
+        # Slightly pull out the largest slice (first row after sorting)
+        pull=[0.05 if i == 0 else 0 for i in cost_df.index],
         marker_colors=px.colors.sequential.Blues_r, # Use a sequential color scheme
-        textinfo='label+percent',
-        insidetextorientation='auto',
+        textinfo='label+percent', # Show label and percentage on slices
+        insidetextorientation='auto', # Let Plotly decide best text orientation
+        # Define hover text format
         hovertemplate="<b>%{label}</b><br>Amount: %{value:$,.2f}<br>Percentage: %{percent:.1%}<extra></extra>"
     )])
 
     # Add center annotation for Total Cost
+    # Make sure your format_currency function is defined elsewhere or replace with f-string formatting
+    try:
+        formatted_total = format_currency(total_cost_for_breakdown)
+    except NameError:
+        # Fallback if format_currency isn't defined in this scope
+        formatted_total = f"${total_cost_for_breakdown:,.2f}"
+
     fig.add_annotation(
-        text=f"Total:<br>{format_currency(total_cost_for_breakdown)}",
-        x=0.5, y=0.5,
+        text=f"Total:<br>{formatted_total}",
+        x=0.5, y=0.5, # Center position
         font_size=18,
         showarrow=False,
-        font_color="#1E3A8A"
+        font_color="#1E3A8A" # Match header color from CSS if possible
     )
 
+    # Update chart layout
     fig.update_layout(
-        legend_title_text='Categories',
-        showlegend=True,
-        margin=dict(t=20, b=20, l=20, r=20),
-        height=500
+        legend_title_text='Categories', # Add title to legend
+        showlegend=True, # Ensure legend is shown
+        margin=dict(t=20, b=20, l=20, r=20), # Adjust margins
+        height=500 # Adjust height as needed for chart + legend
     )
 
+    # Display the chart in Streamlit
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Create CLEANER Styled Dataframe (Displayed below chart) ---
-    st.markdown("#### Breakdown Details") # Add a title above the table
+    # --- Create METRIC DISPLAYS for Breakdown Details (Displayed below chart) ---
+    st.markdown("#### Breakdown Details") # Add a title above the metrics
+    st.markdown("---") # Add a visual separator
 
-    # Function to highlight the top row (index 0) with BOLD text
-    def highlight_top_row_bold(row):
-        # Check if it's the first row (index 0)
-        if row.name == 0:
-             # Apply bold font weight
-            return ['font-weight: bold'] * len(row)
-        else:
-            # No special style for other rows
-            return [''] * len(row)
+    # Define columns for layout (e.g., 3 columns)
+    # Adjust the number of columns based on how many items you have and desired layout
+    num_metrics = len(cost_df)
+    # Use min() to avoid error if fewer than 3 categories exist
+    num_cols = min(num_metrics, 3)
+    cols = st.columns(num_cols) # Create the columns
 
-    # Apply styling: alignment, bars (neutral color), highlight (bold), THEN format
-    styled_cost_df = cost_df.style \
-        .set_properties(**{'text-align': 'left'}, subset=['Category']) \
-        .set_properties(**{'text-align': 'right'}, subset=['Amount', 'Percentage']) \
-        .apply(highlight_top_row_bold, axis=1) \
-        .bar(subset=['Percentage'], color='#D1D5DB', vmin=0, vmax=100, align='left', axis=0) \
-        .format({
-            'Amount': format_currency, # Apply currency format LAST
-            'Percentage': "{:.1f}%"   # Apply percentage format LAST
-        })
+    # Iterate through the sorted cost data and display metrics
+    col_index = 0
+    for index, row in cost_df.iterrows():
+        # Select the current column using the index
+        with cols[col_index]:
+            # Format the amount value using the helper function or f-string
+            try:
+                metric_value = format_currency(row['Amount'])
+            except NameError:
+                metric_value = f"${row['Amount']:,.2f}"
 
+            # Display the metric: Category as label, Amount as value
+            st.metric(
+                label=row['Category'],
+                value=metric_value
+            )
+            # Display the percentage contribution below the metric
+            # Check if percentage is valid before formatting
+            if pd.notna(row['Percentage']):
+                 st.markdown(f"({row['Percentage']:.1f}% of Total)")
+            else:
+                 st.markdown("(N/A)") # Handle potential NaN percentages
 
-    # Display the styled dataframe
-    st.dataframe(styled_cost_df, use_container_width=True, hide_index=True)
+            # Add some vertical spacing below each metric block for readability
+            st.markdown("<br>", unsafe_allow_html=True)
+
+        # Move to the next column index, wrapping around using modulo
+        col_index = (col_index + 1) % num_cols
+
 
     # --- Conditional Section for 2025 New Hire Impact ---
-    # (Keep this section as it was, placed at the end of the tab)
-    if selected_year == "2025 (Projected)" and num_new_hires > 0:
-        st.markdown("---")
+    # Display this section only if 2025 is selected and new hires are specified
+    # Ensure num_new_hires, selected_hire_dept, selected_band, projected_totals are defined earlier
+    if selected_year == "2025 (Projected)" and 'num_new_hires' in globals() and num_new_hires > 0:
+        st.markdown("---") # Separator before this section
+        # Use the custom highlight style defined in your CSS
         st.markdown('<div class="highlight">', unsafe_allow_html=True)
         st.markdown(f"#### New Hire Impact Analysis ({num_new_hires} Hires)")
         st.markdown(f"**Department:** {selected_hire_dept}, **Band:** {selected_band}")
-        if 'hiring_costs' in projected_totals and projected_totals['hiring_costs'] > 0:
-            st.metric(label="Estimated Total Hiring Costs", value=format_currency(projected_totals['hiring_costs']))
+
+        # Check if hiring cost data is available in the projected totals
+        if 'projected_totals' in globals() and 'hiring_costs' in projected_totals and projected_totals['hiring_costs'] > 0:
+            # Format hiring cost values
+            try:
+                hiring_cost_formatted = format_currency(projected_totals['hiring_costs'])
+            except NameError:
+                hiring_cost_formatted = f"${projected_totals['hiring_costs']:,.2f}"
+
+            st.metric(label="Estimated Total Hiring Costs", value=hiring_cost_formatted)
+
+            # Calculate and display cost per new hire
             cost_per_hire = projected_totals['hiring_costs'] / num_new_hires
-            st.metric(label="Estimated Cost per Hire", value=format_currency(cost_per_hire))
+            try:
+                cost_per_hire_formatted = format_currency(cost_per_hire)
+            except NameError:
+                 cost_per_hire_formatted = f"${cost_per_hire:,.2f}"
+
+            st.metric(label="Estimated Cost per Hire", value=cost_per_hire_formatted)
         else:
+            # Display message if hiring cost data is missing or zero
             st.info("Hiring cost data not available or calculated as zero.")
+        # Close the highlight div
         st.markdown('</div>', unsafe_allow_html=True)
 
 # Tab 2: Year-over-Year Comparison
