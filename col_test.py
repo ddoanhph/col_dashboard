@@ -119,29 +119,26 @@ st.set_page_config(
 # Apply custom CSS for better styling, including updated titles
 st.markdown("""
 <style>
-    /* Add Font Awesome CDN */
-    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
-
-    /* NEW: Style for the AIRBUS title */
     .airbus-title {
-        font-family: 'Arial Black', 'Tahoma Bold', Gadget, sans-serif; /* Font approximation */
+        font-family: 'Poppins', sans-serif; /* MODIFIED: Use Poppins font */
         font-size: 1.8rem; /* Adjust size as needed */
         font-weight: 900; /* Extra bold */
         color: #00205B; /* Airbus dark blue */
-        text-align: center; /* Center the title */
+        /* text-align: center; */ /* MODIFIED: Removed centering */
+        text-align: left; /* Explicitly left-align */
         margin-bottom: 0.1rem; /* Small space below */
         letter-spacing: 1px; /* Optional: slight letter spacing */
+        padding-left: 1rem; /* Add some padding to align with content */
     }
 
-    /* MODIFIED: Style for the main dashboard title */
     .main-header {
-        font-size: 3.0rem; /* MODIFIED: Increased font size */
-        font-weight: 700;
+        font-family: 'Poppins', sans-serif; /* MODIFIED: Use Poppins font */
+        font-size: 3.0rem; /* Keep increased font size */
+        font-weight: 700; /* Bold */
         color: #1E3A8A; /* Dark Blue */
-        text-align: center; /* MODIFIED: Center the title */
+        text-align: center; /* Keep centered */
         margin-bottom: 0.5rem;
     }
-
     /* Style for the description text below titles */
     .dashboard-description {
         text-align: center; /* Center the description */
@@ -222,12 +219,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- MODIFIED Title and Description Rendering ---
-# NEW: Render AIRBUS title
 st.markdown('<div class="airbus-title">AIRBUS</div>', unsafe_allow_html=True)
-# MODIFIED: Render main dashboard title (already uses main-header class)
 st.markdown('<div class="main-header">Cost of Labor Dashboard</div>', unsafe_allow_html=True)
-# MODIFIED: Render description with centering class
 st.markdown("""
 <div class="dashboard-description">
 This dashboard provides a comprehensive view of labor costs for 2023, 2024, and projected costs for 2025.
