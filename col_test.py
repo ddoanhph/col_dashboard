@@ -579,30 +579,25 @@ with tab1:
 
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Create ENHANCED Styled Dataframe (Displayed below chart) ---
+    # --- Create CLEANER Styled Dataframe (Displayed below chart) ---
     st.markdown("#### Breakdown Details") # Add a title above the table
 
-    # Define styles
-    # Use a Blues color map for the gradient, matching the chart
-    amount_gradient_cmap = sns.light_palette("#2563EB", as_cmap=True) # Medium Blue base
-
-    # Function to highlight the top row (index 0)
-    def highlight_top_row(row):
+    # Function to highlight the top row (index 0) with BOLD text
+    def highlight_top_row_bold(row):
         # Check if it's the first row (index 0)
         if row.name == 0:
-             # Apply bold font weight and a light background
-            return ['font-weight: bold; background-color: #EFF6FF'] * len(row)
+             # Apply bold font weight
+            return ['font-weight: bold'] * len(row)
         else:
             # No special style for other rows
             return [''] * len(row)
 
-    # Apply styling: alignment, gradient, bars, highlight, THEN format
+    # Apply styling: alignment, bars (neutral color), highlight (bold), THEN format
     styled_cost_df = cost_df.style \
         .set_properties(**{'text-align': 'left'}, subset=['Category']) \
         .set_properties(**{'text-align': 'right'}, subset=['Amount', 'Percentage']) \
-        .apply(highlight_top_row, axis=1) \
-        .background_gradient(cmap=amount_gradient_cmap, subset=['Amount'], axis=0) \
-        .bar(subset=['Percentage'], color='#60A5FA', vmin=0, vmax=100, align='left', axis=0) \
+        .apply(highlight_top_row_bold, axis=1) \
+        .bar(subset=['Percentage'], color='#D1D5DB', vmin=0, vmax=100, align='left', axis=0) \
         .format({
             'Amount': format_currency, # Apply currency format LAST
             'Percentage': "{:.1f}%"   # Apply percentage format LAST
