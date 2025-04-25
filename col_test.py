@@ -132,7 +132,7 @@ st.markdown("""
     }
 
     .main-header {
-        font-size: 2.5rem;
+        font-size: 4.5rem;
         font-weight: 700;
         color: #1E3A8A; /* Dark Blue */
         text-align: center;
