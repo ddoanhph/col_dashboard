@@ -652,7 +652,7 @@ with tab3:
         analysis_df = df_2024_filtered # Base analysis on 2024 data for projection year
         analysis_totals = current_totals # Use the calculated totals for the selected view
 
-    subtab1, subtab2, subtab3 = st.tabs(["Department Analysis", "Band Distribution", "Hours Analysis"])
+    subtab1, subtab2 = st.tabs(["Department Analysis", "Band Distribution"])
 
     # Subtab 1: Department Analysis
     with subtab1:
@@ -725,51 +725,6 @@ with tab3:
             band_analysis['Average Salary Formatted'] = band_analysis['Average Salary'].apply(lambda x: f"${x:,.0f}")
         st.dataframe(band_analysis[['Band', 'Employee Count', 'Total Base Salary Formatted', 'Average Salary Formatted']],
                      hide_index=True, use_container_width=True)
-
-    # Subtab 3: Hours Analysis
-    with subtab3:
-        st.markdown("##### Hours and Absence Analysis")
-        # Only show actual hours analysis for past/current years
-        if selected_year != "2025 (Projected)":
-            hours_data = {
-                'Category': ['Planned Hours', 'Actual Hours'],
-                'Hours': [ analysis_totals.get('total_planned_hours', 0), analysis_totals.get('total_actual_hours', 0) ]
-            }
-            hours_df = pd.DataFrame(hours_data)
-            fig_hours = px.bar(hours_df, x='Category', y='Hours', title='Planned vs. Actual Hours',
-                               color='Category', color_discrete_sequence=['#93C5FD', '#2563EB'], text='Hours')
-            fig_hours.update_layout(height=400, showlegend=False)
-            fig_hours.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
-            fig_hours.update_yaxes(rangemode='tozero')
-            st.plotly_chart(fig_hours, use_container_width=True)
-
-            hours_diff = analysis_totals.get('total_actual_hours', 0) - analysis_totals.get('total_planned_hours', 0)
-            hours_diff_percent = safe_division(analysis_totals.get('total_actual_hours', 0), analysis_totals.get('total_planned_hours', 0))
-
-            col_h1, col_h2 = st.columns(2)
-            with col_h1:
-                st.metric(label="Total Hours Difference", value=f"{hours_diff:,.0f} hrs",
-                          delta=f"{hours_diff_percent:.1f}%" if hours_diff_percent != float('inf') else "N/A",
-                          help="Actual Hours minus Planned Hours")
-            with col_h2:
-                 st.metric(label="Total Overtime Hours", value=f"{analysis_totals.get('total_overtime_hours', 0):,.0f} hrs",
-                           help="Sum of (Actual - Planned) where positive")
-
-            st.markdown("---")
-            st.markdown("##### Absence Cost Analysis")
-            absence_cost = analysis_totals.get('total_absence_costs', 0)
-            base_salary_total = analysis_totals.get('total_base_salary', 0)
-            absence_perc = (absence_cost / base_salary_total * 100) if base_salary_total > 0 else 0
-
-            col_a1, col_a2 = st.columns(2)
-            with col_a1:
-                st.metric(label="Total Absence Cost", value=format_currency(absence_cost))
-            with col_a2:
-                st.metric(label="Absence Cost as % of Base Salary", value=f"{absence_perc:.2f}%")
-
-        else:
-            st.info("Detailed hours and absence analysis is based on actual data and not shown for projected year.")
-
 
 # --- Tab 4: 2025 Projection Details (Conditional) ---
 # This block only runs if the fourth tab ('tab4') was created
