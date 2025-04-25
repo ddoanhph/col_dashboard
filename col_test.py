@@ -148,7 +148,7 @@ st.markdown("""
 
     /* --- Keep other existing styles below --- */
     .sub-header {
-        font-size: 1.5rem;
+        font-size: 2.5rem;
         font-weight: 600;
         color: #2563EB; /* Medium Blue */
         margin-top: 1.5rem;
