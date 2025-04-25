@@ -17,48 +17,37 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- Custom CSS ---
 st.markdown("""
 <style>
-    /* Import Google Font */
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
-    /* Add Font Awesome CDN */
-    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
-
-    /* Style for the AIRBUS title */
     .airbus-title {
-        font-family: 'Poppins', sans-serif;
-        font-size: 1.8rem;
+        font-family: 'Poppins', sans-serif; /* MODIFIED: Use Poppins font */
+        font-size: 1.8rem; /* Adjust size as needed */
         font-weight: 900; /* Extra bold */
         color: #00205B; /* Airbus dark blue */
-        text-align: left; /* Left-align */
-        margin-bottom: 0.1rem;
-        letter-spacing: 1px;
-        padding-left: 1rem; /* Add some padding */
+        /* text-align: center; */ /* MODIFIED: Removed centering */
+        text-align: left; /* Explicitly left-align */
+        margin-bottom: 0.1rem; /* Small space below */
+        letter-spacing: 1px; /* Optional: slight letter spacing */
+        padding-left: 1rem; /* Add some padding to align with content */
     }
 
-    /* Style for the main dashboard title */
     .main-header {
-        font-family: 'Poppins', sans-serif;
-        font-size: 3.0rem;
-        font-weight: 700; /* Bold */
+        font-size: 4.0rem;
+        font-weight: 700;
         color: #1E3A8A; /* Dark Blue */
-        text-align: center; /* Center */
+        text-align: center;
         margin-bottom: 0.5rem;
     }
-
     /* Style for the description text below titles */
     .dashboard-description {
-        font-family: 'Poppins', sans-serif;
-        text-align: center;
-        color: #4B5563;
-        margin-bottom: 2rem;
+        text-align: center; /* Center the description */
+        color: #4B5563; /* Grey text */
+        margin-bottom: 2rem; /* Add space below description */
     }
 
-    /* Style for sub-headers within tabs */
+    /* --- Keep other existing styles below --- */
     .sub-header {
-        font-family: 'Poppins', sans-serif;
-        font-size: 1.5rem;
+        font-size: 2.5rem;
         font-weight: 600;
         color: #2563EB; /* Medium Blue */
         margin-top: 1.5rem;
@@ -66,88 +55,77 @@ st.markdown("""
         border-bottom: 2px solid #DBEAFE; /* Light blue underline */
         padding-bottom: 0.25rem;
     }
-
-    /* Style for the metric cards */
     .metric-card {
-        background-color: #FFFFFF;
-        border-radius: 8px;
-        padding: 1.25rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        border: 1px solid #E5E7EB;
-        border-left: 6px solid #2563EB;
-        margin-bottom: 1rem;
-        height: 100%;
+        background-color: #FFFFFF; /* White background */
+        border-radius: 8px; /* Slightly more rounded corners */
+        padding: 1.25rem; /* Increased padding */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Lighter initial shadow */
+        border: 1px solid #E5E7EB; /* Light grey border */
+        border-left: 6px solid #2563EB; /* ACCENT BORDER - Medium Blue */
+        margin-bottom: 1rem; /* Space below each card */
+        height: 100%; /* Make cards in a row the same height */
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        transition: all 0.2s ease-in-out;
+        transition: all 0.2s ease-in-out; /* Smooth transition for hover */
     }
     .metric-card:hover {
-        box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1);
-        transform: translateY(-4px);
-        border-left-color: #1E3A8A;
+        box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1); /* Deeper shadow on hover */
+        transform: translateY(-4px); /* Slight lift effect */
+        border-left-color: #1E3A8A; /* Darken accent border on hover */
     }
     .metric-value {
-        font-family: 'Poppins', sans-serif;
-        font-size: 2.1rem;
+        font-size: 2.1rem; /* Slightly larger value */
         font-weight: 700;
-        color: #1E3A8A;
+        color: #1E3A8A; /* Dark Blue */
         line-height: 1.2;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.5rem; /* More space before label */
     }
     .metric-label-container {
         display: flex;
-        align-items: center;
-        gap: 0.6rem;
+        align-items: center; /* Vertically align icon and text */
+        gap: 0.6rem;      /* Space between icon and text */
     }
     .metric-label {
-        font-family: 'Poppins', sans-serif;
         font-size: 0.95rem;
-        color: #4B5563;
+        color: #4B5563; /* Grey text */
         font-weight: 500;
-        margin: 0;
+        margin: 0; /* Remove default margins */
     }
     .metric-icon {
-        color: #6B7280;
-        font-size: 1.2rem;
-        width: 20px;
+        color: #6B7280; /* Icon color - Medium Grey */
+        font-size: 1.2rem; /* Adjust icon size */
+        width: 20px; /* Give icon a fixed width for alignment */
         text-align: center;
     }
-
-    /* Style for highlighted sections (e.g., new hire impact) */
     .highlight {
-        background-color: #EFF6FF; /* Light blue background */
+        background-color: #EFF6FF;
         padding: 1rem;
         border-radius: 0.5rem;
-        border-left: 5px solid #2563EB; /* Blue accent border */
+        border-left: 5px solid #2563EB;
         margin-top: 1rem;
-        margin-bottom: 1rem; /* Add space below */
     }
-
-    /* Main container padding */
     .main .block-container {
         padding-top: 2rem;
-        padding-bottom: 2rem; /* Add padding at the bottom */
     }
-
-    /* Styling for default Streamlit metric components */
+    /* Optional: Style default st.metric if used elsewhere */
     div[data-testid="stMetric"] {
        background-color: #FFFFFF; border: 1px solid #E5E7EB;
        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 1rem; border-radius: 8px;
-       margin-bottom: 1rem; /* Add space below default metrics */
     }
-    div[data-testid="stMetric"] > label {
-        font-family: 'Poppins', sans-serif;
-        font-weight: 500;
-        color: #4B5563 !important;
-    }
-    div[data-testid="stMetric"] > div:first-of-type { /* Target the value div */
-        font-family: 'Poppins', sans-serif;
-        color: #1E3A8A !important;
-    }
+    div[data-testid="stMetric"] > label { font-weight: 500; color: #4B5563 !important; }
+    div[data-testid="stMetric"] > div { color: #1E3A8A !important; }
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown('<div class="airbus-title">AIRBUS</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">Cost of Labor Dashboard</div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="dashboard-description">
+This dashboard provides a comprehensive view of labor costs for 2023, 2024, and projected costs for 2025.
+It allows for simulation of new hires and their impact on the overall cost structure.
+</div>
+""", unsafe_allow_html=True)
 
 # --- Helper Functions ---
 
