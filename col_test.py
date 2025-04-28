@@ -127,6 +127,41 @@ It allows for simulation of new hires and their impact on the overall cost struc
 </div>
 """, unsafe_allow_html=True)
 
+# Add to your existing CSS
+st.markdown("""
+<style>
+    /* Enhanced metric styling for the breakdown details */
+    .breakdown-metric label {
+        font-size: 1.3rem !important; 
+        font-weight: 600 !important;
+        color: #1E3A8A !important; /* Dark blue for better visibility */
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .breakdown-metric [data-testid="stMetricValue"] {
+        font-size: 1.8rem !important;
+        font-weight: 700 !important;
+    }
+    
+    .breakdown-percentage {
+        font-size: 1rem !important;
+        color: #4B5563 !important;
+        font-weight: 500 !important;
+        margin-top: 0.5rem !important;
+    }
+    
+    /* You can add custom class to existing metrics */
+    div[data-testid="metric-container"] {
+        background-color: white;
+        border: 1px solid #E5E7EB;
+        border-left: 6px solid #2563EB;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Helper functions for calculations
 def calculate_totals(df):
     """Calculate total cost metrics from employee data"""
