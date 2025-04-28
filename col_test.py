@@ -1163,7 +1163,7 @@ with tab3:
 
 # Footer
 st.markdown("---")
-st.markdown("**Cost of Labor Dashboard** | Developed for HR Analytics | Last updated: February 2025")
+st.markdown("**Cost of Labor Dashboard** | Developed for HR Analytics")
 
 # Add download links for sample data
 st.sidebar.markdown("---")
