@@ -585,43 +585,6 @@ with tab1:
         # Move to the next column index, wrapping around using modulo
         col_index = (col_index + 1) % num_cols
 
-    # --- Create METRIC DISPLAYS for Breakdown Details (Displayed below chart) ---
-    # st.markdown("#### Breakdown Details") # Add a title above the metrics
-    # st.markdown("---") # Add a visual separator
-    
-    # # Define columns for layout
-    # num_metrics = len(cost_df)
-    # num_cols = min(num_metrics, 3)
-    # cols = st.columns(num_cols)
-    
-    # # Iterate through the sorted cost data and display custom metrics
-    # col_index = 0
-    # for index, row in cost_df.iterrows():
-    #     with cols[col_index]:
-    #         # Format the amount value
-    #         try:
-    #             metric_value = format_currency(row['Amount'])
-    #         except NameError:
-    #             metric_value = f"${row['Amount']:,.2f}"
-                
-    #         # Format the percentage
-    #         percentage_text = f"({row['Percentage']:.1f}% of Total)" if pd.notna(row['Percentage']) else "(N/A)"
-            
-    #         # Create custom card with HTML/CSS for better styling
-    #         st.markdown(f'''
-    #             <div style="background-color: white; padding: 1rem; border-radius: 8px; 
-    #                         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #E5E7EB; 
-    #                         border-left: 6px solid #2563EB; margin-bottom: 1rem;">
-    #                 <h3 style="font-size: 1.3rem; font-weight: 600; color: #1E3A8A; margin-bottom: 0.5rem;">
-    #                     {row['Category']}
-    #                 </h3>
-    #                 <div style="font-size: 1.8rem; font-weight: 700; color: #1E3A8A;">{metric_value}</div>
-    #                 <div style="font-size: 1rem; color: #4B5563; margin-top: 0.5rem;">{percentage_text}</div>
-    #             </div>
-    #         ''', unsafe_allow_html=True)
-            
-    #     col_index = (col_index + 1) % num_cols
-
 
     # --- Conditional Section for 2025 New Hire Impact ---
     # Display this section only if 2025 is selected and new hires are specified
@@ -656,6 +619,199 @@ with tab1:
             st.info("Hiring cost data not available or calculated as zero.")
         # Close the highlight div
         st.markdown('</div>', unsafe_allow_html=True)
+
+    # Advanced 2025 Projection Section
+    if selected_year == "2025 (Projected)":
+        st.markdown("---")
+        st.markdown('<div class="sub-header">2025 Projection Details</div>', unsafe_allow_html=True)
+    
+        # Create two columns
+        col1, col2 = st.columns(2)
+    
+        with col1:
+            st.markdown("### New Hire Cost Breakdown")
+    
+            if num_new_hires > 0:
+                # Get averages for the selected department and band
+                hire_avg = band_avg_df[(band_avg_df['department'] == selected_hire_dept) &
+                                       (band_avg_df['band'] == selected_band)].iloc[0]
+    
+                # Create breakdown of costs per new hire
+                new_hire_data = {
+                    'Category': [
+                        'Base Salary',
+                        'Premiums',
+                        'Bonuses',
+                        'Social Contributions',
+                        'LTIPs',
+                        'Hiring Cost',
+                        'Total Cost per Hire'
+                    ],
+                    'Amount': [
+                        hire_avg['avg_base_salary'],
+                        hire_avg['avg_work_conditions'] + hire_avg['avg_overtime'] + hire_avg['avg_other_premiums'],
+                        hire_avg['avg_annual_bonus'] + hire_avg['avg_profit_sharing'],
+                        hire_avg['avg_social_security'] + hire_avg['avg_medicare'] + hire_avg['avg_401k'] + hire_avg[
+                            'avg_pension'],
+                        hire_avg['avg_ltips'],
+                        hire_avg['avg_hiring_cost'],
+                        0  # Will calculate total below
+                    ]
+                }
+                new_hire_df = pd.DataFrame(new_hire_data)
+    
+                # Calculate total
+                new_hire_df.loc[6, 'Amount'] = new_hire_df['Amount'].sum()
+    
+                # Format as currency
+                new_hire_df['Amount'] = new_hire_df['Amount'].apply(format_currency)
+    
+                # Display breakdown
+                st.table(new_hire_df)
+    
+                # Total additional cost
+                total_add_cost = hire_avg['avg_base_salary'] + \
+                                 hire_avg['avg_work_conditions'] + hire_avg['avg_overtime'] + hire_avg[
+                                     'avg_other_premiums'] + \
+                                 hire_avg['avg_annual_bonus'] + hire_avg['avg_profit_sharing'] + \
+                                 hire_avg['avg_social_security'] + hire_avg['avg_medicare'] + hire_avg['avg_401k'] + \
+                                 hire_avg['avg_pension'] + \
+                                 hire_avg['avg_ltips'] + hire_avg['avg_hiring_cost']
+    
+                st.markdown(
+                    f"**Total Additional Cost for {num_new_hires} New Hires:** {format_currency(total_add_cost * num_new_hires)}")
+            else:
+                st.markdown("No new hires selected for 2025 projection.")
+    
+        with col2:
+            st.markdown("### Cost Growth Analysis")
+    
+            # Calculate growth from 2024 to projected 2025
+            growth_categories = [
+                'Base Salary',
+                'Premiums',
+                'Bonuses',
+                'Social Contributions',
+                'LTIPs',
+                'Total Cost'
+            ]
+    
+            growth_2024_values = [
+                totals_2024['total_base_salary'],
+                totals_2024['total_premiums'],
+                totals_2024['total_bonuses'],
+                totals_2024['total_social_contributions'],
+                totals_2024['total_ltips'],
+                totals_2024['total_cost']
+            ]
+    
+            growth_2025_values = [
+                projected_totals['total_base_salary'],
+                projected_totals['total_premiums'],
+                projected_totals['total_bonuses'],
+                projected_totals['total_social_contributions'],
+                projected_totals['total_ltips'],
+                projected_totals['total_cost']
+            ]
+    
+            growth_rates = [
+                ((g2025 - g2024) / g2024 * 100).round(2)
+                for g2025, g2024 in zip(growth_2025_values, growth_2024_values)
+            ]
+    
+            # Create growth chart
+            growth_df = pd.DataFrame({
+                'Category': growth_categories,
+                'Growth Rate (%)': growth_rates
+            })
+    
+            fig = px.bar(
+                growth_df,
+                x='Category',
+                y='Growth Rate (%)',
+                title='Projected 2024-2025 Growth Rates',
+                color='Growth Rate (%)',
+                color_continuous_scale='Blues',
+                text='Growth Rate (%)'
+            )
+    
+            fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    
+            st.plotly_chart(fig, use_container_width=True)
+    
+        # Add what-if scenario analysis section
+        st.markdown("### What-If Scenario Analysis")
+    
+        # Create a range of potential new hire counts
+        scenario_hires = list(range(0, 21, 5))
+        if num_new_hires > 0 and num_new_hires not in scenario_hires:
+            scenario_hires.append(num_new_hires)
+            scenario_hires.sort()
+    
+        # Calculate scenarios
+        scenario_data = []
+    
+        for hire_count in scenario_hires:
+            scenario = project_costs_for_new_hires(
+                totals_2024,
+                band_avg_df,
+                selected_hire_dept,
+                selected_band,
+                hire_count
+            )
+    
+            row = {
+                'New Hires': hire_count,
+                'Total Cost': scenario['total_cost'],
+                'Cost Increase': scenario['total_cost'] - totals_2024['total_cost'],
+                'Percent Increase': (
+                            (scenario['total_cost'] - totals_2024['total_cost']) / totals_2024['total_cost'] * 100).round(2)
+            }
+    
+            scenario_data.append(row)
+    
+        scenario_df = pd.DataFrame(scenario_data)
+    
+        # Create scenario chart
+        fig = px.line(
+            scenario_df,
+            x='New Hires',
+            y='Total Cost',
+            title=f'Cost Projection Scenarios for {selected_hire_dept} {selected_band} Hires',
+            markers=True
+        )
+    
+        # Add second y-axis for percentage increase
+        fig.add_trace(
+            go.Scatter(
+                x=scenario_df['New Hires'],
+                y=scenario_df['Percent Increase'],
+                name='Percent Increase',
+                yaxis='y2',
+                line=dict(color='red', dash='dot'),
+                mode='lines+markers'
+            )
+        )
+    
+        # Update layout for dual y-axes
+        fig.update_layout(
+            yaxis=dict(title='Total Cost ($)'),
+            yaxis2=dict(title='Percent Increase (%)', overlaying='y', side='right'),
+            legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+        )
+    
+        # Add dollar sign formatting to primary y-axis
+        fig.update_yaxes(tickprefix="$", tickformat=",", secondary_y=False)
+        fig.update_yaxes(ticksuffix="%", secondary_y=True)
+    
+        st.plotly_chart(fig, use_container_width=True)
+    
+        # Display scenario table
+        scenario_df['Total Cost'] = scenario_df['Total Cost'].apply(format_currency)
+        scenario_df['Cost Increase'] = scenario_df['Cost Increase'].apply(format_currency)
+        scenario_df['Percent Increase'] = scenario_df['Percent Increase'].apply(lambda x: f"{x}%")
+    
+        st.table(scenario_df)
 
 # Tab 2: Year-over-Year Comparison
 with tab2:
@@ -1066,201 +1222,6 @@ with tab3:
 #             absence_df = pd.DataFrame(absence_data)
 
 #             st.table(absence_df)
-
-
-
-# Advanced 2025 Projection Section
-if selected_year == "2025 (Projected)":
-    st.markdown("---")
-    st.markdown('<div class="sub-header">2025 Projection Details</div>', unsafe_allow_html=True)
-
-    # Create two columns
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.markdown("### New Hire Cost Breakdown")
-
-        if num_new_hires > 0:
-            # Get averages for the selected department and band
-            hire_avg = band_avg_df[(band_avg_df['department'] == selected_hire_dept) &
-                                   (band_avg_df['band'] == selected_band)].iloc[0]
-
-            # Create breakdown of costs per new hire
-            new_hire_data = {
-                'Category': [
-                    'Base Salary',
-                    'Premiums',
-                    'Bonuses',
-                    'Social Contributions',
-                    'LTIPs',
-                    'Hiring Cost',
-                    'Total Cost per Hire'
-                ],
-                'Amount': [
-                    hire_avg['avg_base_salary'],
-                    hire_avg['avg_work_conditions'] + hire_avg['avg_overtime'] + hire_avg['avg_other_premiums'],
-                    hire_avg['avg_annual_bonus'] + hire_avg['avg_profit_sharing'],
-                    hire_avg['avg_social_security'] + hire_avg['avg_medicare'] + hire_avg['avg_401k'] + hire_avg[
-                        'avg_pension'],
-                    hire_avg['avg_ltips'],
-                    hire_avg['avg_hiring_cost'],
-                    0  # Will calculate total below
-                ]
-            }
-            new_hire_df = pd.DataFrame(new_hire_data)
-
-            # Calculate total
-            new_hire_df.loc[6, 'Amount'] = new_hire_df['Amount'].sum()
-
-            # Format as currency
-            new_hire_df['Amount'] = new_hire_df['Amount'].apply(format_currency)
-
-            # Display breakdown
-            st.table(new_hire_df)
-
-            # Total additional cost
-            total_add_cost = hire_avg['avg_base_salary'] + \
-                             hire_avg['avg_work_conditions'] + hire_avg['avg_overtime'] + hire_avg[
-                                 'avg_other_premiums'] + \
-                             hire_avg['avg_annual_bonus'] + hire_avg['avg_profit_sharing'] + \
-                             hire_avg['avg_social_security'] + hire_avg['avg_medicare'] + hire_avg['avg_401k'] + \
-                             hire_avg['avg_pension'] + \
-                             hire_avg['avg_ltips'] + hire_avg['avg_hiring_cost']
-
-            st.markdown(
-                f"**Total Additional Cost for {num_new_hires} New Hires:** {format_currency(total_add_cost * num_new_hires)}")
-        else:
-            st.markdown("No new hires selected for 2025 projection.")
-
-    with col2:
-        st.markdown("### Cost Growth Analysis")
-
-        # Calculate growth from 2024 to projected 2025
-        growth_categories = [
-            'Base Salary',
-            'Premiums',
-            'Bonuses',
-            'Social Contributions',
-            'LTIPs',
-            'Total Cost'
-        ]
-
-        growth_2024_values = [
-            totals_2024['total_base_salary'],
-            totals_2024['total_premiums'],
-            totals_2024['total_bonuses'],
-            totals_2024['total_social_contributions'],
-            totals_2024['total_ltips'],
-            totals_2024['total_cost']
-        ]
-
-        growth_2025_values = [
-            projected_totals['total_base_salary'],
-            projected_totals['total_premiums'],
-            projected_totals['total_bonuses'],
-            projected_totals['total_social_contributions'],
-            projected_totals['total_ltips'],
-            projected_totals['total_cost']
-        ]
-
-        growth_rates = [
-            ((g2025 - g2024) / g2024 * 100).round(2)
-            for g2025, g2024 in zip(growth_2025_values, growth_2024_values)
-        ]
-
-        # Create growth chart
-        growth_df = pd.DataFrame({
-            'Category': growth_categories,
-            'Growth Rate (%)': growth_rates
-        })
-
-        fig = px.bar(
-            growth_df,
-            x='Category',
-            y='Growth Rate (%)',
-            title='Projected 2024-2025 Growth Rates',
-            color='Growth Rate (%)',
-            color_continuous_scale='Blues',
-            text='Growth Rate (%)'
-        )
-
-        fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
-
-        st.plotly_chart(fig, use_container_width=True)
-
-    # Add what-if scenario analysis section
-    st.markdown("### What-If Scenario Analysis")
-
-    # Create a range of potential new hire counts
-    scenario_hires = list(range(0, 21, 5))
-    if num_new_hires > 0 and num_new_hires not in scenario_hires:
-        scenario_hires.append(num_new_hires)
-        scenario_hires.sort()
-
-    # Calculate scenarios
-    scenario_data = []
-
-    for hire_count in scenario_hires:
-        scenario = project_costs_for_new_hires(
-            totals_2024,
-            band_avg_df,
-            selected_hire_dept,
-            selected_band,
-            hire_count
-        )
-
-        row = {
-            'New Hires': hire_count,
-            'Total Cost': scenario['total_cost'],
-            'Cost Increase': scenario['total_cost'] - totals_2024['total_cost'],
-            'Percent Increase': (
-                        (scenario['total_cost'] - totals_2024['total_cost']) / totals_2024['total_cost'] * 100).round(2)
-        }
-
-        scenario_data.append(row)
-
-    scenario_df = pd.DataFrame(scenario_data)
-
-    # Create scenario chart
-    fig = px.line(
-        scenario_df,
-        x='New Hires',
-        y='Total Cost',
-        title=f'Cost Projection Scenarios for {selected_hire_dept} {selected_band} Hires',
-        markers=True
-    )
-
-    # Add second y-axis for percentage increase
-    fig.add_trace(
-        go.Scatter(
-            x=scenario_df['New Hires'],
-            y=scenario_df['Percent Increase'],
-            name='Percent Increase',
-            yaxis='y2',
-            line=dict(color='red', dash='dot'),
-            mode='lines+markers'
-        )
-    )
-
-    # Update layout for dual y-axes
-    fig.update_layout(
-        yaxis=dict(title='Total Cost ($)'),
-        yaxis2=dict(title='Percent Increase (%)', overlaying='y', side='right'),
-        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
-    )
-
-    # Add dollar sign formatting to primary y-axis
-    fig.update_yaxes(tickprefix="$", tickformat=",", secondary_y=False)
-    fig.update_yaxes(ticksuffix="%", secondary_y=True)
-
-    st.plotly_chart(fig, use_container_width=True)
-
-    # Display scenario table
-    scenario_df['Total Cost'] = scenario_df['Total Cost'].apply(format_currency)
-    scenario_df['Cost Increase'] = scenario_df['Cost Increase'].apply(format_currency)
-    scenario_df['Percent Increase'] = scenario_df['Percent Increase'].apply(lambda x: f"{x}%")
-
-    st.table(scenario_df)
 
 # Footer
 st.markdown("---")
