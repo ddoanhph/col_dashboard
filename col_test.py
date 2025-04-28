@@ -935,7 +935,7 @@ with tab2:
 
     # Configure the overall chart layout
     fig.update_layout(
-        title="Cost Comparison (Outline/Text shows 2023-2024 change)", # Informative title
+        title="Comparative Cost Analysis: 2023 vs. 2024 Trends", # Informative title
         xaxis_title="Cost Category",
         yaxis_title="Amount ($)",
         legend_title="Year",
@@ -1165,25 +1165,25 @@ with tab3:
 st.markdown("---")
 st.markdown("**Cost of Labor Dashboard** | Developed for HR Analytics")
 
-# Add download links for sample data
-st.sidebar.markdown("---")
-st.sidebar.markdown("### Download Sample Data Templates")
+# # Add download links for sample data
+# st.sidebar.markdown("---")
+# st.sidebar.markdown("### Download Sample Data Templates")
 
-# Create download buttons for sample CSVs
-if st.sidebar.button("Download Employee Data Template"):
-    csv = df_2023.to_csv(index=False)
-    st.sidebar.download_button(
-        label="Click to Download",
-        data=csv,
-        file_name="employee_data_template.csv",
-        mime="text/csv"
-    )
+# # Create download buttons for sample CSVs
+# if st.sidebar.button("Download Employee Data Template"):
+#     csv = df_2023.to_csv(index=False)
+#     st.sidebar.download_button(
+#         label="Click to Download",
+#         data=csv,
+#         file_name="employee_data_template.csv",
+#         mime="text/csv"
+#     )
 
-if st.sidebar.button("Download Band Averages Template"):
-    csv = band_avg_df.to_csv(index=False)
-    st.sidebar.download_button(
-        label="Click to Download",
-        data=csv,
-        file_name="band_averages_template.csv",
-        mime="text/csv"
-    )
+# if st.sidebar.button("Download Band Averages Template"):
+#     csv = band_avg_df.to_csv(index=False)
+#     st.sidebar.download_button(
+#         label="Click to Download",
+#         data=csv,
+#         file_name="band_averages_template.csv",
+#         mime="text/csv"
+#     )
