@@ -585,30 +585,43 @@ with tab1:
     #     # Move to the next column index, wrapping around using modulo
     #     col_index = (col_index + 1) % num_cols
 
-    # --- Create a styled table for Breakdown Details ---
-    st.markdown("#### Breakdown Details") # Add a title above
+    # --- Create METRIC DISPLAYS for Breakdown Details (Displayed below chart) ---
+    st.markdown("#### Breakdown Details") # Add a title above the metrics
     st.markdown("---") # Add a visual separator
     
-    # Rename the columns for better display
-    display_df = cost_df.copy()
-    display_df.columns = ['Category', 'Amount ($)', 'Percentage (%)']
+    # Define columns for layout
+    num_metrics = len(cost_df)
+    num_cols = min(num_metrics, 3)
+    cols = st.columns(num_cols)
     
-    # Create a styled dataframe
-    styled_df = display_df.style.set_properties(**{
-        'font-size': '1.2rem',
-        'background-color': 'white',
-        'border': '1px solid #E5E7EB',
-        'padding': '0.75rem',
-        'text-align': 'left'
-    }).set_properties(subset=['Category'], **{
-        'font-weight': 'bold',
-        'color': '#1E3A8A',
-        'font-size': '1.3rem'
-    }).format({"Amount ($)": "${:,.2f}", "Percentage (%)": "{:.1f}%"}).bar(
-        subset=["Percentage (%)"], color='#93C5FD', vmin=0, vmax=100
-    )
-    
-    st.dataframe(styled_df, use_container_width=True, height=300)
+    # Iterate through the sorted cost data and display custom metrics
+    col_index = 0
+    for index, row in cost_df.iterrows():
+        with cols[col_index]:
+            # Format the amount value
+            try:
+                metric_value = format_currency(row['Amount'])
+            except NameError:
+                metric_value = f"${row['Amount']:,.2f}"
+                
+            # Format the percentage
+            percentage_text = f"({row['Percentage']:.1f}% of Total)" if pd.notna(row['Percentage']) else "(N/A)"
+            
+            # Create custom card with HTML/CSS for better styling
+            st.markdown(f'''
+                <div style="background-color: white; padding: 1rem; border-radius: 8px; 
+                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #E5E7EB; 
+                            border-left: 6px solid #2563EB; margin-bottom: 1rem;">
+                    <h3 style="font-size: 1.3rem; font-weight: 600; color: #1E3A8A; margin-bottom: 0.5rem;">
+                        {row['Category']}
+                    </h3>
+                    <div style="font-size: 1.8rem; font-weight: 700; color: #1E3A8A;">{metric_value}</div>
+                    <div style="font-size: 1rem; color: #4B5563; margin-top: 0.5rem;">{percentage_text}</div>
+                </div>
+            ''', unsafe_allow_html=True)
+            
+        col_index = (col_index + 1) % num_cols
+
 
     # --- Conditional Section for 2025 New Hire Impact ---
     # Display this section only if 2025 is selected and new hires are specified
