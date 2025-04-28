@@ -545,7 +545,7 @@ with tab1:
     # Display the chart in Streamlit
     st.plotly_chart(fig, use_container_width=True)
 
-    --- Create METRIC DISPLAYS for Breakdown Details (Displayed below chart) ---
+    # --- Create METRIC DISPLAYS for Breakdown Details (Displayed below chart) ---
     st.markdown("#### Breakdown Details") # Add a title above the metrics
     st.markdown("---") # Add a visual separator
 
