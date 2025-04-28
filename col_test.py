@@ -546,81 +546,81 @@ with tab1:
     st.plotly_chart(fig, use_container_width=True)
 
     # --- Create METRIC DISPLAYS for Breakdown Details (Displayed below chart) ---
-    # st.markdown("#### Breakdown Details") # Add a title above the metrics
-    # st.markdown("---") # Add a visual separator
-
-    # # Define columns for layout (e.g., 3 columns)
-    # # Adjust the number of columns based on how many items you have and desired layout
-    # num_metrics = len(cost_df)
-    # # Use min() to avoid error if fewer than 3 categories exist
-    # num_cols = min(num_metrics, 3)
-    # cols = st.columns(num_cols) # Create the columns
-
-    # # Iterate through the sorted cost data and display metrics
-    # col_index = 0
-    # for index, row in cost_df.iterrows():
-    #     # Select the current column using the index
-    #     with cols[col_index]:
-    #         # Format the amount value using the helper function or f-string
-    #         try:
-    #             metric_value = format_currency(row['Amount'])
-    #         except NameError:
-    #             metric_value = f"${row['Amount']:,.2f}"
-
-    #         # Display the metric: Category as label, Amount as value
-    #         st.metric(
-    #             label=row['Category'],
-    #             value=metric_value
-    #         )
-    #         # Display the percentage contribution below the metric
-    #         # Check if percentage is valid before formatting
-    #         if pd.notna(row['Percentage']):
-    #              st.markdown(f"({row['Percentage']:.1f}% of Total)")
-    #         else:
-    #              st.markdown("(N/A)") # Handle potential NaN percentages
-
-    #         # Add some vertical spacing below each metric block for readability
-    #         st.markdown("<br>", unsafe_allow_html=True)
-
-    #     # Move to the next column index, wrapping around using modulo
-    #     col_index = (col_index + 1) % num_cols
-
-    # --- Create METRIC DISPLAYS for Breakdown Details (Displayed below chart) ---
     st.markdown("#### Breakdown Details") # Add a title above the metrics
     st.markdown("---") # Add a visual separator
-    
-    # Define columns for layout
+
+    # Define columns for layout (e.g., 3 columns)
+    # Adjust the number of columns based on how many items you have and desired layout
     num_metrics = len(cost_df)
+    # Use min() to avoid error if fewer than 3 categories exist
     num_cols = min(num_metrics, 3)
-    cols = st.columns(num_cols)
-    
-    # Iterate through the sorted cost data and display custom metrics
+    cols = st.columns(num_cols) # Create the columns
+
+    # Iterate through the sorted cost data and display metrics
     col_index = 0
     for index, row in cost_df.iterrows():
+        # Select the current column using the index
         with cols[col_index]:
-            # Format the amount value
+            # Format the amount value using the helper function or f-string
             try:
                 metric_value = format_currency(row['Amount'])
             except NameError:
                 metric_value = f"${row['Amount']:,.2f}"
-                
-            # Format the percentage
-            percentage_text = f"({row['Percentage']:.1f}% of Total)" if pd.notna(row['Percentage']) else "(N/A)"
-            
-            # Create custom card with HTML/CSS for better styling
-            st.markdown(f'''
-                <div style="background-color: white; padding: 1rem; border-radius: 8px; 
-                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #E5E7EB; 
-                            border-left: 6px solid #2563EB; margin-bottom: 1rem;">
-                    <h3 style="font-size: 1.3rem; font-weight: 600; color: #1E3A8A; margin-bottom: 0.5rem;">
-                        {row['Category']}
-                    </h3>
-                    <div style="font-size: 1.8rem; font-weight: 700; color: #1E3A8A;">{metric_value}</div>
-                    <div style="font-size: 1rem; color: #4B5563; margin-top: 0.5rem;">{percentage_text}</div>
-                </div>
-            ''', unsafe_allow_html=True)
-            
+
+            # Display the metric: Category as label, Amount as value
+            st.metric(
+                label=row['Category'],
+                value=metric_value
+            )
+            # Display the percentage contribution below the metric
+            # Check if percentage is valid before formatting
+            if pd.notna(row['Percentage']):
+                 st.markdown(f"({row['Percentage']:.1f}% of Total)")
+            else:
+                 st.markdown("(N/A)") # Handle potential NaN percentages
+
+            # Add some vertical spacing below each metric block for readability
+            st.markdown("<br>", unsafe_allow_html=True)
+
+        # Move to the next column index, wrapping around using modulo
         col_index = (col_index + 1) % num_cols
+
+    # --- Create METRIC DISPLAYS for Breakdown Details (Displayed below chart) ---
+    # st.markdown("#### Breakdown Details") # Add a title above the metrics
+    # st.markdown("---") # Add a visual separator
+    
+    # # Define columns for layout
+    # num_metrics = len(cost_df)
+    # num_cols = min(num_metrics, 3)
+    # cols = st.columns(num_cols)
+    
+    # # Iterate through the sorted cost data and display custom metrics
+    # col_index = 0
+    # for index, row in cost_df.iterrows():
+    #     with cols[col_index]:
+    #         # Format the amount value
+    #         try:
+    #             metric_value = format_currency(row['Amount'])
+    #         except NameError:
+    #             metric_value = f"${row['Amount']:,.2f}"
+                
+    #         # Format the percentage
+    #         percentage_text = f"({row['Percentage']:.1f}% of Total)" if pd.notna(row['Percentage']) else "(N/A)"
+            
+    #         # Create custom card with HTML/CSS for better styling
+    #         st.markdown(f'''
+    #             <div style="background-color: white; padding: 1rem; border-radius: 8px; 
+    #                         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #E5E7EB; 
+    #                         border-left: 6px solid #2563EB; margin-bottom: 1rem;">
+    #                 <h3 style="font-size: 1.3rem; font-weight: 600; color: #1E3A8A; margin-bottom: 0.5rem;">
+    #                     {row['Category']}
+    #                 </h3>
+    #                 <div style="font-size: 1.8rem; font-weight: 700; color: #1E3A8A;">{metric_value}</div>
+    #                 <div style="font-size: 1rem; color: #4B5563; margin-top: 0.5rem;">{percentage_text}</div>
+    #             </div>
+    #         ''', unsafe_allow_html=True)
+            
+    #     col_index = (col_index + 1) % num_cols
 
 
     # --- Conditional Section for 2025 New Hire Impact ---
