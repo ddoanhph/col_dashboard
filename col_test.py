@@ -19,16 +19,28 @@ st.set_page_config(
 # Apply custom CSS for better styling, including updated titles
 st.markdown("""
 <style>
+    # .airbus-title {
+    #     font-family: 'Poppins', sans-serif; /* MODIFIED: Use Poppins font */
+    #     font-size: 1.8rem; /* Adjust size as needed */
+    #     font-weight: 900; /* Extra bold */
+    #     color: #00205B; /* Airbus dark blue */
+    #     /* text-align: center; */ /* MODIFIED: Removed centering */
+    #     text-align: left; /* Explicitly left-align */
+    #     margin-bottom: 0.1rem; /* Small space below */
+    #     letter-spacing: 1px; /* Optional: slight letter spacing */
+    #     padding-left: 1rem; /* Add some padding to align with content */
+    # }
     .airbus-title {
-        font-family: 'Poppins', sans-serif; /* MODIFIED: Use Poppins font */
-        font-size: 1.8rem; /* Adjust size as needed */
-        font-weight: 900; /* Extra bold */
+        /* Primary font choice with fallbacks */
+        font-family: 'Frutiger', 'Univers', 'DIN Condensed', sans-serif;
+        font-size: 2.2rem; /* Increased size for better visibility */
+        font-weight: 700; /* Bold weight */
         color: #00205B; /* Airbus dark blue */
-        /* text-align: center; */ /* MODIFIED: Removed centering */
-        text-align: left; /* Explicitly left-align */
-        margin-bottom: 0.1rem; /* Small space below */
-        letter-spacing: 1px; /* Optional: slight letter spacing */
-        padding-left: 1rem; /* Add some padding to align with content */
+        text-align: left;
+        margin-bottom: 0.1rem;
+        letter-spacing: 0.5px; /* Slight letter spacing for distinction */
+        padding-left: 1rem;
+        text-transform: uppercase; /* Ensure uppercase display */
     }
 
     .main-header {
