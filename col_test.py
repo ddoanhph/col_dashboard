@@ -16,106 +16,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# # Apply custom CSS for better styling
-# st.markdown("""
-# <style>
-#     /* Add Font Awesome CDN */
-#     @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
-
-#     .main-header {
-#         font-size: 2.5rem;
-#         font-weight: 700;
-#         color: #1E3A8A; /* Dark Blue */
-#         margin-bottom: 0.5rem;
-#     }
-#     .sub-header {
-#         font-size: 1.5rem;
-#         font-weight: 600;
-#         color: #2563EB; /* Medium Blue */
-#         margin-top: 1.5rem;
-#         margin-bottom: 0.75rem;
-#         border-bottom: 2px solid #DBEAFE; /* Light blue underline */
-#         padding-bottom: 0.25rem;
-#     }
-#     .metric-card {
-#         background-color: #FFFFFF; /* White background */
-#         border-radius: 8px; /* Slightly more rounded corners */
-#         padding: 1.25rem; /* Increased padding */
-#         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Lighter initial shadow */
-#         border: 1px solid #E5E7EB; /* Light grey border */
-#         border-left: 6px solid #2563EB; /* ACCENT BORDER - Medium Blue */
-#         margin-bottom: 1rem; /* Space below each card */
-#         height: 100%; /* Make cards in a row the same height */
-#         display: flex;
-#         flex-direction: column;
-#         justify-content: space-between;
-#         transition: all 0.2s ease-in-out; /* Smooth transition for hover */
-#     }
-
-#     /* HOVER EFFECT */
-#     .metric-card:hover {
-#         box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1); /* Deeper shadow on hover */
-#         transform: translateY(-4px); /* Slight lift effect */
-#         border-left-color: #1E3A8A; /* Darken accent border on hover */
-#     }
-
-#     .metric-value {
-#         font-size: 2.1rem; /* Slightly larger value */
-#         font-weight: 700;
-#         color: #1E3A8A; /* Dark Blue */
-#         line-height: 1.2;
-#         margin-bottom: 0.5rem; /* More space before label */
-#     }
-
-#     /* Container for label and icon */
-#     .metric-label-container {
-#         display: flex;
-#         align-items: center; /* Vertically align icon and text */
-#         gap: 0.6rem;       /* Space between icon and text */
-#     }
-
-#     .metric-label {
-#         font-size: 0.95rem;
-#         color: #4B5563; /* Grey text */
-#         font-weight: 500;
-#         margin: 0; /* Remove default margins */
-#     }
-
-#     /* Icon Style */
-#     .metric-icon {
-#         color: #6B7280; /* Icon color - Medium Grey */
-#         font-size: 1.2rem; /* Adjust icon size */
-#         width: 20px; /* Give icon a fixed width for alignment */
-#         text-align: center;
-#     }
-
-#     .highlight {
-#         background-color: #EFF6FF;
-#         padding: 1rem;
-#         border-radius: 0.5rem;
-#         border-left: 5px solid #2563EB;
-#         margin-top: 1rem;
-#     }
-#     .main .block-container {
-#         padding-top: 2rem;
-#     }
-#     /* Optional: Style default st.metric if used elsewhere */
-#     div[data-testid="stMetric"] {
-#        background-color: #FFFFFF; border: 1px solid #E5E7EB;
-#        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 1rem; border-radius: 8px;
-#     }
-#     div[data-testid="stMetric"] > label { font-weight: 500; color: #4B5563 !important; }
-#     div[data-testid="stMetric"] > div { color: #1E3A8A !important; }
-# </style>
-# """, unsafe_allow_html=True)
-
-# Title and description
-# st.markdown('<div class="main-header">Cost of Labor Dashboard</div>', unsafe_allow_html=True)
-# st.markdown("""
-# This dashboard provides a comprehensive view of labor costs for 2023, 2024, and projected costs for 2025.
-# It allows for simulation of new hires and their impact on the overall cost structure.
-# """)
-
 # Apply custom CSS for better styling, including updated titles
 st.markdown("""
 <style>
@@ -623,13 +523,6 @@ tab1, tab2, tab3 = st.tabs(["📊 Cost Breakdown", "📈 Year-over-Year", "🔍 
 #             st.info("Hiring cost data not available or calculated as zero.")
 
 #         st.markdown('</div>', unsafe_allow_html=True)
-
-# Ensure these imports are at the top of your main script
-import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
-# import seaborn as sns # No longer needed for this version
 
 # Tab 1: Cost Breakdown
 with tab1:
