@@ -225,73 +225,11 @@ def format_currency(value):
 
 def load_data():
     """Load the CSV data files"""
-    try:
-        # For a real application, these would be actual file paths
-        # For now, let's create sample data
+    df_2023 = pd.read_csv('employee_data_2023.csv')
+    df_2024 = pd.read_csv('employee_data_2024.csv')
+    band_avg_df = pd.read_csv('band_averages.csv')
 
-        # Create sample data for 2023 and 2024
-        df_2023 = pd.read_csv('employee_data_2023.csv')
-        df_2024 = pd.read_csv('employee_data_2024.csv')
-
-        # Load band averages
-        band_avg_df = pd.read_csv('band_averages.csv')
-
-        return df_2023, df_2024, band_avg_df
-    except Exception as e:
-        # If we can't load the files, create dummy data for demonstration
-        st.warning(f"Could not load actual data files. Using sample data for demonstration.")
-
-        # Create sample employee data
-        sample_data = [
-            [1001, "John Doe", "ERP", "BV", 85000, 2500, 3500, 1000, 8500, 2000, 5270, 1232.5, 2550, 1700, 4250, 2080,
-             2095, 5, 12, 2, "USD", 1.0],
-            [1002, "Jane Smith", "ERA", "BIV", 72000, 1800, 2200, 800, 7200, 1440, 4464, 1044, 2160, 1440, 3600, 2080,
-             2065, 8, 12, 3, "USD", 1.0],
-            [1003, "Michael Johnson", "ERZ", "BIII", 65000, 1500, 1800, 700, 6500, 1300, 4030, 942.5, 1950, 1300, 3250,
-             2080, 2090, 3, 12, 1, "USD", 1.0],
-            [1004, "Lisa Brown", "8VC", "BVI", 92000, 3000, 4100, 1200, 9200, 2300, 5704, 1334, 2760, 1840, 4600, 2080,
-             2110, 4, 12, 0, "USD", 1.0],
-            [1005, "Robert Chen", "MMS", "BV", 84000, 2400, 3200, 900, 8400, 1680, 5208, 1218, 2520, 1680, 4200, 2080,
-             2075, 6, 12, 4, "USD", 1.0],
-            [1006, "Sarah Wilson", "WC", "BIV", 71000, 1700, 2100, 750, 7100, 1420, 4402, 1029.5, 2130, 1420, 3550,
-             2080, 2050, 10, 12, 2, "USD", 1.0],
-        ]
-
-        columns = ["employee_id", "name", "department", "band", "base_salary", "work_conditions_premium",
-                   "overtime_premium", "other_premiums", "annual_bonus", "profit_sharing",
-                   "social_security_tax", "medicare", "er_401k", "er_pension", "ltips",
-                   "planned_hours", "actual_hours", "sick_days", "holiday_days", "other_absences",
-                   "currency", "fx_rate"]
-
-        df_2023 = pd.DataFrame(sample_data, columns=columns)
-
-        # Create slightly modified data for 2024 (5% increase in most values)
-        df_2024 = df_2023.copy()
-        for col in ["base_salary", "work_conditions_premium", "overtime_premium", "other_premiums",
-                    "annual_bonus", "profit_sharing", "social_security_tax", "medicare",
-                    "er_401k", "er_pension", "ltips"]:
-            df_2024[col] = df_2024[col] * 1.05
-
-        # Create band averages
-        band_data = [
-            ["ERP", "BV", 85000, 2500, 3500, 1000, 8500, 2000, 5270, 1232.5, 2550, 1700, 4250, 2080, 5, 12000],
-            ["ERA", "BIV", 72000, 1800, 2200, 800, 7200, 1440, 4464, 1044, 2160, 1440, 3600, 2080, 7, 9000],
-            ["ERZ", "BIII", 65000, 1500, 1800, 700, 6500, 1300, 4030, 942.5, 1950, 1300, 3250, 2080, 4, 7500],
-            ["8VC", "BVI", 92000, 3000, 4100, 1200, 9200, 2300, 5704, 1334, 2760, 1840, 4600, 2080, 4, 15000],
-            ["MMS", "BV", 84000, 2400, 3200, 900, 8400, 1680, 5208, 1218, 2520, 1680, 4200, 2080, 6, 12000],
-            ["WC", "BIV", 71000, 1700, 2100, 750, 7100, 1420, 4402, 1029.5, 2130, 1420, 3550, 2080, 8, 9000],
-            ["BC", "BIII", 66000, 1600, 1900, 700, 6600, 1320, 4092, 957, 1980, 1320, 3300, 2080, 7, 7500],
-        ]
-
-        band_columns = ["department", "band", "avg_base_salary", "avg_work_conditions", "avg_overtime",
-                        "avg_other_premiums", "avg_annual_bonus", "avg_profit_sharing",
-                        "avg_social_security", "avg_medicare", "avg_401k", "avg_pension",
-                        "avg_ltips", "avg_planned_hours", "avg_sick_days", "avg_hiring_cost"]
-
-        band_avg_df = pd.DataFrame(band_data, columns=band_columns)
-
-        return df_2023, df_2024, band_avg_df
-
+    return df_2023, df_2024, band_avg_df
 
 # Load data
 df_2023, df_2024, band_avg_df = load_data()
