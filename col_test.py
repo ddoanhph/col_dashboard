@@ -423,71 +423,6 @@ tab1, tab2, tab3 = st.tabs(["📊 Cost Breakdown", "📈 Year-over-Year", "🔍 
 
 
 # Tab 1: Cost Breakdown (Good version)
-# with tab1:
-#     st.markdown('<div class="sub-header">Cost Breakdown Analysis</div>', unsafe_allow_html=True)
-
-#     # --- Data Preparation for the Chart and Table ---
-#     # (current_totals is already calculated based on selected year and filters before the tabs)
-#     cost_data = {
-#         'Category': ['Base Salary', 'Premiums', 'Bonuses', 'Social Contributions', 'LTIPs'],
-#         'Amount': [
-#             current_totals['total_base_salary'],
-#             current_totals['total_premiums'],
-#             current_totals['total_bonuses'],
-#             current_totals['total_social_contributions'],
-#             current_totals['total_ltips']
-#         ]
-#     }
-#     cost_df = pd.DataFrame(cost_data)
-
-#     # Calculate total for percentages and center annotation
-#     total_cost_for_breakdown = cost_df['Amount'].sum()
-
-#     # Calculate percentages (handle division by zero if total is zero)
-#     if total_cost_for_breakdown > 0:
-#         cost_df['Percentage'] = (cost_df['Amount'] / total_cost_for_breakdown * 100)
-#     else:
-#         cost_df['Percentage'] = 0.0
-
-#     # Sort by Amount descending for better visual hierarchy (optional but recommended)
-#     cost_df = cost_df.sort_values(by='Amount', ascending=False).reset_index(drop=True)
-
-#     # --- Create Donut Chart (Displayed first) ---
-#     st.markdown(f"#### Cost Distribution for {selected_year}") # Add a title above the chart
-
-#     fig = go.Figure(data=[go.Pie(
-#         labels=cost_df['Category'],
-#         values=cost_df['Amount'],
-#         hole=.4,  # Creates the donut hole
-#         pull=[0.05 if i == 0 else 0 for i in cost_df.index], # Slightly pull out the largest slice
-#         marker_colors=px.colors.sequential.Blues_r, # Use a sequential color scheme
-#         # MODIFIED: Show label and percentage on slices
-#         textinfo='label+percent',
-#         # texttemplate='%{label}<br>%{percent:.1%}', # Optional: Custom template if needed
-#         insidetextorientation='auto', # Let Plotly decide best text orientation
-#         hovertemplate="<b>%{label}</b><br>Amount: %{value:$,.2f}<br>Percentage: %{percent:.1%}<extra></extra>" # Custom hover text
-#     )])
-
-#     # Add center annotation for Total Cost
-#     fig.add_annotation(
-#         text=f"Total:<br>{format_currency(total_cost_for_breakdown)}", # Use helper function
-#         x=0.5, y=0.5, # Center position
-#         font_size=18,
-#         showarrow=False,
-#         font_color="#1E3A8A" # Match header color
-#     )
-
-#     fig.update_layout(
-#         # title=f'Cost Distribution for {selected_year}', # Title moved outside chart
-#         legend_title_text='Categories', # Add title to legend
-#         showlegend=True, # MODIFIED: Ensure legend is shown
-#         margin=dict(t=20, b=20, l=20, r=20), # Adjust margins
-#         height=500 # Adjust height as needed for chart + legend
-#     )
-
-#     # Display the chart, taking full container width
-#     st.plotly_chart(fig, use_container_width=True)
-
 #     # --- Create Styled Dataframe with Data Bars (Displayed below chart) ---
 #     st.markdown("#### Breakdown Details") # Add a title above the table
 
@@ -610,78 +545,44 @@ with tab1:
     # Display the chart in Streamlit
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Create METRIC DISPLAYS for Breakdown Details (Displayed below chart) ---
-    # st.markdown("#### Breakdown Details") # Add a title above the metrics
-    # st.markdown("---") # Add a visual separator
+    --- Create METRIC DISPLAYS for Breakdown Details (Displayed below chart) ---
+    st.markdown("#### Breakdown Details") # Add a title above the metrics
+    st.markdown("---") # Add a visual separator
 
-    # # Define columns for layout (e.g., 3 columns)
-    # # Adjust the number of columns based on how many items you have and desired layout
-    # num_metrics = len(cost_df)
-    # # Use min() to avoid error if fewer than 3 categories exist
-    # num_cols = min(num_metrics, 3)
-    # cols = st.columns(num_cols) # Create the columns
-
-    # # Iterate through the sorted cost data and display metrics
-    # col_index = 0
-    # for index, row in cost_df.iterrows():
-    #     # Select the current column using the index
-    #     with cols[col_index]:
-    #         # Format the amount value using the helper function or f-string
-    #         try:
-    #             metric_value = format_currency(row['Amount'])
-    #         except NameError:
-    #             metric_value = f"${row['Amount']:,.2f}"
-
-    #         # Display the metric: Category as label, Amount as value
-    #         st.metric(
-    #             label=row['Category'],
-    #             value=metric_value
-    #         )
-    #         # Display the percentage contribution below the metric
-    #         # Check if percentage is valid before formatting
-    #         if pd.notna(row['Percentage']):
-    #              st.markdown(f"({row['Percentage']:.1f}% of Total)")
-    #         else:
-    #              st.markdown("(N/A)") # Handle potential NaN percentages
-
-    #         # Add some vertical spacing below each metric block for readability
-    #         st.markdown("<br>", unsafe_allow_html=True)
-
-    #     # Move to the next column index, wrapping around using modulo
-    #     col_index = (col_index + 1) % num_cols
-
-    # --- Create STYLED METRIC DISPLAYS for Breakdown Details ---
-    st.markdown("#### Breakdown Details")
-    st.markdown("---")
-
+    # Define columns for layout (e.g., 3 columns)
+    # Adjust the number of columns based on how many items you have and desired layout
     num_metrics = len(cost_df)
+    # Use min() to avoid error if fewer than 3 categories exist
     num_cols = min(num_metrics, 3)
-    cols = st.columns(num_cols)
+    cols = st.columns(num_cols) # Create the columns
 
+    # Iterate through the sorted cost data and display metrics
     col_index = 0
     for index, row in cost_df.iterrows():
+        # Select the current column using the index
         with cols[col_index]:
-            # Format the amount value
-            try: metric_value = format_currency(row['Amount'])
-            except NameError: metric_value = f"${row['Amount']:,.2f}"
+            # Format the amount value using the helper function or f-string
+            try:
+                metric_value = format_currency(row['Amount'])
+            except NameError:
+                metric_value = f"${row['Amount']:,.2f}"
 
-            # Display the metric (CSS will style the label and value)
+            # Display the metric: Category as label, Amount as value
             st.metric(
                 label=row['Category'],
                 value=metric_value
             )
-
-            # MODIFIED: Display the percentage using markdown wrapped in a styled div
+            # Display the percentage contribution below the metric
+            # Check if percentage is valid before formatting
             if pd.notna(row['Percentage']):
-                 # Wrap the markdown in a div with the new class
-                 st.markdown(f"<div class='metric-percentage-detail'>({row['Percentage']:.1f}% of Total)</div>", unsafe_allow_html=True)
+                 st.markdown(f"({row['Percentage']:.1f}% of Total)")
             else:
-                 # Handle potential NaN percentages
-                 st.markdown("<div class='metric-percentage-detail'>(N/A)</div>", unsafe_allow_html=True)
+                 st.markdown("(N/A)") # Handle potential NaN percentages
 
-            # Optional: Add extra space below if needed (might not be necessary with padding-bottom in CSS)
-            # st.markdown("<br>", unsafe_allow_html=True)
+            # Add some vertical spacing below each metric block for readability
+            st.markdown("<br>", unsafe_allow_html=True)
 
+        # Move to the next column index, wrapping around using modulo
         col_index = (col_index + 1) % num_cols
 
     # --- Conditional Section for 2025 New Hire Impact ---
