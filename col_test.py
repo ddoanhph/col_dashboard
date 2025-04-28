@@ -611,45 +611,78 @@ with tab1:
     st.plotly_chart(fig, use_container_width=True)
 
     # --- Create METRIC DISPLAYS for Breakdown Details (Displayed below chart) ---
-    st.markdown("#### Breakdown Details") # Add a title above the metrics
-    st.markdown("---") # Add a visual separator
+    # st.markdown("#### Breakdown Details") # Add a title above the metrics
+    # st.markdown("---") # Add a visual separator
 
-    # Define columns for layout (e.g., 3 columns)
-    # Adjust the number of columns based on how many items you have and desired layout
+    # # Define columns for layout (e.g., 3 columns)
+    # # Adjust the number of columns based on how many items you have and desired layout
+    # num_metrics = len(cost_df)
+    # # Use min() to avoid error if fewer than 3 categories exist
+    # num_cols = min(num_metrics, 3)
+    # cols = st.columns(num_cols) # Create the columns
+
+    # # Iterate through the sorted cost data and display metrics
+    # col_index = 0
+    # for index, row in cost_df.iterrows():
+    #     # Select the current column using the index
+    #     with cols[col_index]:
+    #         # Format the amount value using the helper function or f-string
+    #         try:
+    #             metric_value = format_currency(row['Amount'])
+    #         except NameError:
+    #             metric_value = f"${row['Amount']:,.2f}"
+
+    #         # Display the metric: Category as label, Amount as value
+    #         st.metric(
+    #             label=row['Category'],
+    #             value=metric_value
+    #         )
+    #         # Display the percentage contribution below the metric
+    #         # Check if percentage is valid before formatting
+    #         if pd.notna(row['Percentage']):
+    #              st.markdown(f"({row['Percentage']:.1f}% of Total)")
+    #         else:
+    #              st.markdown("(N/A)") # Handle potential NaN percentages
+
+    #         # Add some vertical spacing below each metric block for readability
+    #         st.markdown("<br>", unsafe_allow_html=True)
+
+    #     # Move to the next column index, wrapping around using modulo
+    #     col_index = (col_index + 1) % num_cols
+
+    # --- Create STYLED METRIC DISPLAYS for Breakdown Details ---
+    st.markdown("#### Breakdown Details")
+    st.markdown("---")
+
     num_metrics = len(cost_df)
-    # Use min() to avoid error if fewer than 3 categories exist
     num_cols = min(num_metrics, 3)
-    cols = st.columns(num_cols) # Create the columns
+    cols = st.columns(num_cols)
 
-    # Iterate through the sorted cost data and display metrics
     col_index = 0
     for index, row in cost_df.iterrows():
-        # Select the current column using the index
         with cols[col_index]:
-            # Format the amount value using the helper function or f-string
-            try:
-                metric_value = format_currency(row['Amount'])
-            except NameError:
-                metric_value = f"${row['Amount']:,.2f}"
+            # Format the amount value
+            try: metric_value = format_currency(row['Amount'])
+            except NameError: metric_value = f"${row['Amount']:,.2f}"
 
-            # Display the metric: Category as label, Amount as value
+            # Display the metric (CSS will style the label and value)
             st.metric(
                 label=row['Category'],
                 value=metric_value
             )
-            # Display the percentage contribution below the metric
-            # Check if percentage is valid before formatting
+
+            # MODIFIED: Display the percentage using markdown wrapped in a styled div
             if pd.notna(row['Percentage']):
-                 st.markdown(f"({row['Percentage']:.1f}% of Total)")
+                 # Wrap the markdown in a div with the new class
+                 st.markdown(f"<div class='metric-percentage-detail'>({row['Percentage']:.1f}% of Total)</div>", unsafe_allow_html=True)
             else:
-                 st.markdown("(N/A)") # Handle potential NaN percentages
+                 # Handle potential NaN percentages
+                 st.markdown("<div class='metric-percentage-detail'>(N/A)</div>", unsafe_allow_html=True)
 
-            # Add some vertical spacing below each metric block for readability
-            st.markdown("<br>", unsafe_allow_html=True)
+            # Optional: Add extra space below if needed (might not be necessary with padding-bottom in CSS)
+            # st.markdown("<br>", unsafe_allow_html=True)
 
-        # Move to the next column index, wrapping around using modulo
         col_index = (col_index + 1) % num_cols
-
 
     # --- Conditional Section for 2025 New Hire Impact ---
     # Display this section only if 2025 is selected and new hires are specified
