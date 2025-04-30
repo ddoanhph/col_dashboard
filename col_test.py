@@ -130,56 +130,55 @@ st.set_page_config(
 # </div>
 # """, unsafe_allow_html=True)
 
-# Apply custom CSS for better styling, with improved header layout
+# Apply custom CSS for side-by-side header layout
 st.markdown("""
 <style>
-    /* Header container to properly position logo and title */
+    /* Header container for side-by-side layout */
     .header-container {
         display: flex;
         flex-direction: column;
         margin-bottom: 1rem;
     }
     
-    /* Top bar with logo and optional divider */
+    /* Top bar with logo and title side-by-side */
     .top-bar {
         display: flex;
         align-items: center;
-        margin-bottom: 0.5rem;
+        justify-content: space-between;
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid #CBD5E1;
+        margin-bottom: 1rem;
     }
     
-    /* Airbus branding */
+    /* Airbus branding - adjusted for side-by-side */
     .airbus-title {
         font-family: 'Frutiger', 'Univers', 'DIN Condensed', sans-serif;
-        font-size: 2.8rem;
+        font-size: 2.6rem;
         font-weight: 700;
         color: #00205B; /* Airbus dark blue */
-        text-align: left;
-        margin: 0;
-        letter-spacing: 0.5px;
-        padding-left: 1rem;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0;
     }
 
-    /* Main dashboard title */
+    /* Main dashboard title - adjusted for side-by-side */
     .main-header {
-        font-size: 3.3rem;
+        font-size: 2.6rem;
         font-weight: 700;
         color: #1E3A8A; /* Dark Blue */
-        text-align: center;
-        margin: 0.5rem 0 1rem 0;
+        margin: 0;
         position: relative;
     }
     
-    /* Decorative underline for main header */
+    /* Optional: Decorative accent for main header */
     .main-header:after {
         content: "";
         position: absolute;
-        width: 100px;
+        width: 80px;
         height: 3px;
         background-color: #2563EB;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
+        bottom: -8px;
+        left: 0;
     }
     
     /* Dashboard description text */
@@ -190,14 +189,6 @@ st.markdown("""
         max-width: 800px;
         margin-left: auto;
         margin-right: auto;
-    }
-    
-    /* Horizontal divider */
-    .header-divider {
-        height: 1px;
-        background: linear-gradient(to right, transparent, #CBD5E1, transparent);
-        margin: 0.5rem 0;
-        width: 100%;
     }
 
     /* --- Keep other existing styles below --- */
@@ -281,14 +272,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Create the header structure
+# Create the header structure with side-by-side layout
 st.markdown("""
 <div class="header-container">
     <div class="top-bar">
         <div class="airbus-title">AIRBUS</div>
+        <div class="main-header">Cost of Labor Dashboard</div>
     </div>
-    <div class="header-divider"></div>
-    <div class="main-header">Cost of Labor Dashboard</div>
     <div class="dashboard-description">
         This dashboard provides a comprehensive view of labor costs for 2023, 2024, and projected costs for 2025.
         It allows for simulation of new hires and their impact on the overall cost structure.
