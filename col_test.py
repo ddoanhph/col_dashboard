@@ -33,7 +33,7 @@ st.markdown("""
     .airbus-title {
         /* Primary font choice with fallbacks */
         font-family: 'Frutiger', 'Univers', 'DIN Condensed', sans-serif;
-        font-size: 3.3rem; /* Increased size for better visibility */
+        font-size: 3.0rem; /* Increased size for better visibility */
         font-weight: 700; /* Bold weight */
         color: #00205B; /* Airbus dark blue */
         text-align: left;
@@ -44,7 +44,7 @@ st.markdown("""
     }
 
     .main-header {
-        font-size: 4.0rem;
+        font-size: 3.5rem;
         font-weight: 700;
         color: #1E3A8A; /* Dark Blue */
         text-align: center;
