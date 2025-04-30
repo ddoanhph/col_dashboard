@@ -19,17 +19,6 @@ st.set_page_config(
 # Apply custom CSS for better styling, including updated titles
 st.markdown("""
 <style>
-    # .airbus-title {
-    #     font-family: 'Poppins', sans-serif; /* MODIFIED: Use Poppins font */
-    #     font-size: 1.8rem; /* Adjust size as needed */
-    #     font-weight: 900; /* Extra bold */
-    #     color: #00205B; /* Airbus dark blue */
-    #     /* text-align: center; */ /* MODIFIED: Removed centering */
-    #     text-align: left; /* Explicitly left-align */
-    #     margin-bottom: 0.1rem; /* Small space below */
-    #     letter-spacing: 1px; /* Optional: slight letter spacing */
-    #     padding-left: 1rem; /* Add some padding to align with content */
-    # }
     .airbus-title {
         /* Primary font choice with fallbacks */
         font-family: 'Frutiger', 'Univers', 'DIN Condensed', sans-serif;
@@ -37,7 +26,8 @@ st.markdown("""
         font-weight: 700; /* Bold weight */
         color: #00205B; /* Airbus dark blue */
         text-align: left;
-        margin-bottom: 0.1rem;
+        margin-bottom: 0;
+        margin-top: 0;
         letter-spacing: 0.5px; /* Slight letter spacing for distinction */
         padding-left: 1rem;
         text-transform: uppercase; /* Ensure uppercase display */
@@ -49,6 +39,7 @@ st.markdown("""
         color: #1E3A8A; /* Dark Blue */
         text-align: center;
         margin-bottom: 0.5rem;
+        margin-top: 0.5rem;
     }
     /* Style for the description text below titles */
     .dashboard-description {
@@ -59,7 +50,7 @@ st.markdown("""
 
     /* --- Keep other existing styles below --- */
     .sub-header {
-        font-size: 2.0rem;
+        font-size: 1.8rem;
         font-weight: 600;
         color: #2563EB; /* Medium Blue */
         margin-top: 1.5rem;
