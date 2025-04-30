@@ -39,7 +39,6 @@ st.markdown("""
         color: #1E3A8A; /* Dark Blue */
         text-align: center;
         margin-bottom: 0.5rem;
-        margin-top: 0.5rem;
     }
     /* Style for the description text below titles */
     .dashboard-description {
