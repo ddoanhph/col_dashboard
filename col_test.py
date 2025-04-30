@@ -16,36 +16,188 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Apply custom CSS for better styling, including updated titles
+# # Apply custom CSS for better styling, including updated titles
+# st.markdown("""
+# <style>
+#     .airbus-title {
+#         /* Primary font choice with fallbacks */
+#         font-family: 'Frutiger', 'Univers', 'DIN Condensed', sans-serif;
+#         font-size: 2.8rem; /* Increased size for better visibility */
+#         font-weight: 700; /* Bold weight */
+#         color: #00205B; /* Airbus dark blue */
+#         text-align: left;
+#         margin-bottom: 0;
+#         margin-top: 0;
+#         letter-spacing: 0.5px; /* Slight letter spacing for distinction */
+#         padding-left: 1rem;
+#         text-transform: uppercase; /* Ensure uppercase display */
+#     }
+
+#     .main-header {
+#         font-size: 3.3rem;
+#         font-weight: 700;
+#         color: #1E3A8A; /* Dark Blue */
+#         text-align: center;
+#         margin-bottom: 0;
+#         margin-top: 0;
+#     }
+#     /* Style for the description text below titles */
+#     .dashboard-description {
+#         text-align: center; /* Center the description */
+#         color: #4B5563; /* Grey text */
+#         margin-bottom: 2rem; /* Add space below description */
+#     }
+
+#     /* --- Keep other existing styles below --- */
+#     .sub-header {
+#         font-size: 1.8rem;
+#         font-weight: 600;
+#         color: #2563EB; /* Medium Blue */
+#         margin-top: 1.5rem;
+#         margin-bottom: 0.75rem;
+#         border-bottom: 2px solid #DBEAFE; /* Light blue underline */
+#         padding-bottom: 0.25rem;
+#     }
+#     .metric-card {
+#         background-color: #FFFFFF; /* White background */
+#         border-radius: 8px; /* Slightly more rounded corners */
+#         padding: 1.25rem; /* Increased padding */
+#         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Lighter initial shadow */
+#         border: 1px solid #E5E7EB; /* Light grey border */
+#         border-left: 6px solid #2563EB; /* ACCENT BORDER - Medium Blue */
+#         margin-bottom: 1rem; /* Space below each card */
+#         height: 100%; /* Make cards in a row the same height */
+#         display: flex;
+#         flex-direction: column;
+#         justify-content: space-between;
+#         transition: all 0.2s ease-in-out; /* Smooth transition for hover */
+#     }
+#     .metric-card:hover {
+#         box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1); /* Deeper shadow on hover */
+#         transform: translateY(-4px); /* Slight lift effect */
+#         border-left-color: #1E3A8A; /* Darken accent border on hover */
+#     }
+#     .metric-value {
+#         font-size: 2.1rem; /* Slightly larger value */
+#         font-weight: 700;
+#         color: #1E3A8A; /* Dark Blue */
+#         line-height: 1.2;
+#         margin-bottom: 0.5rem; /* More space before label */
+#     }
+#     .metric-label-container {
+#         display: flex;
+#         align-items: center; /* Vertically align icon and text */
+#         gap: 0.6rem;      /* Space between icon and text */
+#     }
+#     .metric-label {
+#         font-size: 0.95rem;
+#         color: #4B5563; /* Grey text */
+#         font-weight: 500;
+#         margin: 0; /* Remove default margins */
+#     }
+#     .metric-icon {
+#         color: #6B7280; /* Icon color - Medium Grey */
+#         font-size: 1.2rem; /* Adjust icon size */
+#         width: 20px; /* Give icon a fixed width for alignment */
+#         text-align: center;
+#     }
+#     .highlight {
+#         background-color: #EFF6FF;
+#         padding: 1rem;
+#         border-radius: 0.5rem;
+#         border-left: 5px solid #2563EB;
+#         margin-top: 1rem;
+#     }
+#     .main .block-container {
+#         padding-top: 2rem;
+#     }
+#     /* Optional: Style default st.metric if used elsewhere */
+#     div[data-testid="stMetric"] {
+#        background-color: #FFFFFF; border: 1px solid #E5E7EB;
+#        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 1rem; border-radius: 8px;
+#     }
+#     div[data-testid="stMetric"] > label { font-weight: 500; color: #4B5563 !important; }
+#     div[data-testid="stMetric"] > div { color: #1E3A8A !important; }
+# </style>
+# """, unsafe_allow_html=True)
+
+# st.markdown('<div class="airbus-title">AIRBUS</div>', unsafe_allow_html=True)
+# st.markdown('<div class="main-header">Cost of Labor Dashboard</div>', unsafe_allow_html=True)
+# st.markdown("""
+# <div class="dashboard-description">
+# This dashboard provides a comprehensive view of labor costs for 2023, 2024, and projected costs for 2025.
+# It allows for simulation of new hires and their impact on the overall cost structure.
+# </div>
+# """, unsafe_allow_html=True)
+
+# Apply custom CSS for better styling, with improved header layout
 st.markdown("""
 <style>
+    /* Header container to properly position logo and title */
+    .header-container {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1rem;
+    }
+    
+    /* Top bar with logo and optional divider */
+    .top-bar {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Airbus branding */
     .airbus-title {
-        /* Primary font choice with fallbacks */
         font-family: 'Frutiger', 'Univers', 'DIN Condensed', sans-serif;
-        font-size: 2.8rem; /* Increased size for better visibility */
-        font-weight: 700; /* Bold weight */
+        font-size: 2.8rem;
+        font-weight: 700;
         color: #00205B; /* Airbus dark blue */
         text-align: left;
-        margin-bottom: 0;
-        margin-top: 0;
-        letter-spacing: 0.5px; /* Slight letter spacing for distinction */
+        margin: 0;
+        letter-spacing: 0.5px;
         padding-left: 1rem;
-        text-transform: uppercase; /* Ensure uppercase display */
+        text-transform: uppercase;
     }
 
+    /* Main dashboard title */
     .main-header {
         font-size: 3.3rem;
         font-weight: 700;
         color: #1E3A8A; /* Dark Blue */
         text-align: center;
-        margin-bottom: 0;
-        margin-top: 0;
+        margin: 0.5rem 0 1rem 0;
+        position: relative;
     }
-    /* Style for the description text below titles */
+    
+    /* Decorative underline for main header */
+    .main-header:after {
+        content: "";
+        position: absolute;
+        width: 100px;
+        height: 3px;
+        background-color: #2563EB;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    /* Dashboard description text */
     .dashboard-description {
-        text-align: center; /* Center the description */
-        color: #4B5563; /* Grey text */
-        margin-bottom: 2rem; /* Add space below description */
+        text-align: center;
+        color: #4B5563;
+        margin: 1.5rem 0 2rem 0;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    /* Horizontal divider */
+    .header-divider {
+        height: 1px;
+        background: linear-gradient(to right, transparent, #CBD5E1, transparent);
+        margin: 0.5rem 0;
+        width: 100%;
     }
 
     /* --- Keep other existing styles below --- */
@@ -59,46 +211,46 @@ st.markdown("""
         padding-bottom: 0.25rem;
     }
     .metric-card {
-        background-color: #FFFFFF; /* White background */
-        border-radius: 8px; /* Slightly more rounded corners */
-        padding: 1.25rem; /* Increased padding */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Lighter initial shadow */
-        border: 1px solid #E5E7EB; /* Light grey border */
-        border-left: 6px solid #2563EB; /* ACCENT BORDER - Medium Blue */
-        margin-bottom: 1rem; /* Space below each card */
-        height: 100%; /* Make cards in a row the same height */
+        background-color: #FFFFFF;
+        border-radius: 8px;
+        padding: 1.25rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #E5E7EB;
+        border-left: 6px solid #2563EB;
+        margin-bottom: 1rem;
+        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        transition: all 0.2s ease-in-out; /* Smooth transition for hover */
+        transition: all 0.2s ease-in-out;
     }
     .metric-card:hover {
-        box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1); /* Deeper shadow on hover */
-        transform: translateY(-4px); /* Slight lift effect */
-        border-left-color: #1E3A8A; /* Darken accent border on hover */
+        box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1);
+        transform: translateY(-4px);
+        border-left-color: #1E3A8A;
     }
     .metric-value {
-        font-size: 2.1rem; /* Slightly larger value */
+        font-size: 2.1rem;
         font-weight: 700;
-        color: #1E3A8A; /* Dark Blue */
+        color: #1E3A8A;
         line-height: 1.2;
-        margin-bottom: 0.5rem; /* More space before label */
+        margin-bottom: 0.5rem;
     }
     .metric-label-container {
         display: flex;
-        align-items: center; /* Vertically align icon and text */
-        gap: 0.6rem;      /* Space between icon and text */
+        align-items: center;
+        gap: 0.6rem;
     }
     .metric-label {
         font-size: 0.95rem;
-        color: #4B5563; /* Grey text */
+        color: #4B5563;
         font-weight: 500;
-        margin: 0; /* Remove default margins */
+        margin: 0;
     }
     .metric-icon {
-        color: #6B7280; /* Icon color - Medium Grey */
-        font-size: 1.2rem; /* Adjust icon size */
-        width: 20px; /* Give icon a fixed width for alignment */
+        color: #6B7280;
+        font-size: 1.2rem;
+        width: 20px;
         text-align: center;
     }
     .highlight {
@@ -109,24 +261,38 @@ st.markdown("""
         margin-top: 1rem;
     }
     .main .block-container {
-        padding-top: 2rem;
+        padding-top: 1rem;
     }
     /* Optional: Style default st.metric if used elsewhere */
     div[data-testid="stMetric"] {
-       background-color: #FFFFFF; border: 1px solid #E5E7EB;
-       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 1rem; border-radius: 8px;
+       background-color: #FFFFFF; 
+       border: 1px solid #E5E7EB;
+       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+       padding: 1rem; 
+       border-radius: 8px;
     }
-    div[data-testid="stMetric"] > label { font-weight: 500; color: #4B5563 !important; }
-    div[data-testid="stMetric"] > div { color: #1E3A8A !important; }
+    div[data-testid="stMetric"] > label { 
+        font-weight: 500; 
+        color: #4B5563 !important; 
+    }
+    div[data-testid="stMetric"] > div { 
+        color: #1E3A8A !important; 
+    }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="airbus-title">AIRBUS</div>', unsafe_allow_html=True)
-st.markdown('<div class="main-header">Cost of Labor Dashboard</div>', unsafe_allow_html=True)
+# Create the header structure
 st.markdown("""
-<div class="dashboard-description">
-This dashboard provides a comprehensive view of labor costs for 2023, 2024, and projected costs for 2025.
-It allows for simulation of new hires and their impact on the overall cost structure.
+<div class="header-container">
+    <div class="top-bar">
+        <div class="airbus-title">AIRBUS</div>
+    </div>
+    <div class="header-divider"></div>
+    <div class="main-header">Cost of Labor Dashboard</div>
+    <div class="dashboard-description">
+        This dashboard provides a comprehensive view of labor costs for 2023, 2024, and projected costs for 2025.
+        It allows for simulation of new hires and their impact on the overall cost structure.
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
